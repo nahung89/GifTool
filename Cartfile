@@ -1,0 +1,21 @@
+
+#Log
+github "DaveWoodCom/XCGLogger"
+
+#HTTP Access
+github "Alamofire/Alamofire"
+
+#Reactive
+github "ReactiveX/RxSwift"
+github "RxSwiftCommunity/RxAlamofire" "master"
+
+#JSON paser
+github "johnsundell/unbox"
+github "SwiftyJSON/SwiftyJSON"
+
+#
+github "krzyzanowskim/CryptoSwift"
+github "melvitax/DateHelper"
+
+# ==== UI ====
+github "onevcat/Kingfisher"

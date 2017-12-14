@@ -1,0 +1,13 @@
+{
+  "commitish" : "6.0.2",
+  "iOS" : [
+    {
+      "name" : "ObjcExceptionBridging",
+      "hash" : "a5b4da976bef126cc68ab91197f2f644e82579a40afcd3028bebcadf6cb6bcbe"
+    },
+    {
+      "name" : "XCGLogger",
+      "hash" : "cbca69c60fc31f6f18b178c929e1cf38a370e868042a15fd2531ae7946b53168"
+    }
+  ]
+}
