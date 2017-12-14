@@ -8,20 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		110F6CF21FE28427004FA302 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110F6CF11FE28427004FA302 /* AppDelegate.swift */; };
-		110F6CF41FE28427004FA302 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110F6CF31FE28427004FA302 /* ViewController.swift */; };
+		110F6CF41FE28427004FA302 /* ListSourceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110F6CF31FE28427004FA302 /* ListSourceController.swift */; };
 		110F6CF71FE28427004FA302 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 110F6CF51FE28427004FA302 /* Main.storyboard */; };
 		110F6CF91FE28427004FA302 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 110F6CF81FE28427004FA302 /* Assets.xcassets */; };
 		110F6CFC1FE28427004FA302 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 110F6CFA1FE28427004FA302 /* LaunchScreen.storyboard */; };
+		110F6D041FE284BA004FA302 /* GenerateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110F6D031FE284BA004FA302 /* GenerateViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		110F6CEE1FE28427004FA302 /* GifTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GifTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		110F6CF11FE28427004FA302 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		110F6CF31FE28427004FA302 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		110F6CF31FE28427004FA302 /* ListSourceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListSourceController.swift; sourceTree = "<group>"; };
 		110F6CF61FE28427004FA302 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		110F6CF81FE28427004FA302 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		110F6CFB1FE28427004FA302 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		110F6CFD1FE28427004FA302 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		110F6D031FE284BA004FA302 /* GenerateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,7 +57,8 @@
 			isa = PBXGroup;
 			children = (
 				110F6CF11FE28427004FA302 /* AppDelegate.swift */,
-				110F6CF31FE28427004FA302 /* ViewController.swift */,
+				110F6CF31FE28427004FA302 /* ListSourceController.swift */,
+				110F6D031FE284BA004FA302 /* GenerateViewController.swift */,
 				110F6CF51FE28427004FA302 /* Main.storyboard */,
 				110F6CF81FE28427004FA302 /* Assets.xcassets */,
 				110F6CFA1FE28427004FA302 /* LaunchScreen.storyboard */,
@@ -136,7 +139,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				110F6CF41FE28427004FA302 /* ViewController.swift in Sources */,
+				110F6CF41FE28427004FA302 /* ListSourceController.swift in Sources */,
+				110F6D041FE284BA004FA302 /* GenerateViewController.swift in Sources */,
 				110F6CF21FE28427004FA302 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -211,7 +215,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -262,7 +266,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -310,7 +314,7 @@
 				110F6CFF1FE28427004FA302 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		110F6D001FE28427004FA302 /* Build configuration list for PBXNativeTarget "GifTool" */ = {
 			isa = XCConfigurationList;
@@ -319,7 +323,7 @@
 				110F6D021FE28427004FA302 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
