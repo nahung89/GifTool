@@ -21,17 +21,217 @@ extension Optional {
     }
 }
 
+extension UILabel {
+    
+    func setLineHeight(height: CGFloat) {
+        var txt: String = ""
+        if let t = self.text {
+            txt = t
+        }
+        
+        let paragrahStyle = NSMutableParagraphStyle.init()
+        paragrahStyle.minimumLineHeight = height
+        paragrahStyle.maximumLineHeight = height
+        
+        self.attributedText = NSAttributedString(string: txt,
+                                                 attributes: [NSAttributedStringKey.paragraphStyle : paragrahStyle])
+    }
+    
+    func setLineHeightCenter(height: CGFloat) {
+        var txt: String = ""
+        if let t = self.text {
+            txt = t
+        }
+        
+        let paragrahStyle = NSMutableParagraphStyle.init()
+        paragrahStyle.minimumLineHeight = height
+        paragrahStyle.maximumLineHeight = height
+        paragrahStyle.alignment = .center
+        
+        self.attributedText = NSAttributedString(string: txt,
+                                                 attributes: [NSAttributedStringKey.paragraphStyle : paragrahStyle])
+        
+    }
+    
+    
+    func set(font: UIFont, color: UIColor, text: String) {
+        self.font = font
+        self.textColor = color
+        self.text = text
+    }
+}
+
+extension UIView {
+    
+    @objc convenience init(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) {
+        self.init(frame: CGRect(x: x, y: y, width: w, height: h))
+    }
+}
+
 extension UIViewController {
     
-    func displayError(_ error: Error?) {
-        if let e = error {
-            let alertController = UIAlertController(title: "Error", message: e.localizedDescription, preferredStyle: .alert)
+    func displayError(_ message: String) {
+            let alertController = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default) { (action) in
                 // do nothing...
             }
             alertController.addAction(okAction)
             present(alertController, animated: true, completion: nil)
+    }
+}
+
+extension CGRect {
+    
+    init(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) {
+        self.init(x: x, y: y, width: w, height: h)
+    }
+}
+
+extension CGSize {
+    var w: CGFloat {
+        get {
+            return self.width
+        } set(value) {
+            self.width = value
         }
+    }
+    
+    var h: CGFloat {
+        get {
+            return self.height
+        } set(value) {
+            self.height = value
+        }
+    }
+}
+
+extension CGRect {
+    
+    var x: CGFloat {
+        get {
+            return self.origin.x
+        } set(value) {
+            self.origin.x = value
+        }
+    }
+    
+    var y: CGFloat {
+        get {
+            return self.origin.y
+        } set(value) {
+            self.origin.y = value
+        }
+    }
+    
+    var w: CGFloat {
+        get {
+            return self.size.width
+        } set(value) {
+            self.size.width = value
+        }
+    }
+    
+    var h: CGFloat {
+        get {
+            return self.size.height
+        } set(value) {
+            self.size.height = value
+        }
+    }
+    
+}
+
+extension UIView {
+    
+    public func removeAllSubview() {
+        for (_, v) in self.subviews.enumerated() {
+            v.removeFromSuperview()
+        }
+    }
+}
+
+extension UIView {
+    
+    func makeColor(includeSelf: Bool = false) {
+        if includeSelf {
+            self.backgroundColor = UIColor.random()
+        }
+        for view in subviews {
+            view.backgroundColor = UIColor.random(alpha: 0.5)
+        }
+    }
+}
+
+extension UIColor {
+    
+    public static func random(alpha: CGFloat = 1.0) -> UIColor {
+        let randomRed = CGFloat.random()
+        let randomGreen = CGFloat.random()
+        let randomBlue = CGFloat.random()
+        return UIColor(red: randomRed, green: randomGreen, blue: randomBlue, alpha: alpha)
+    }
+    
+}
+
+private extension CGFloat {
+    static func random(_ lower: CGFloat = 0, _ upper: CGFloat = 1) -> CGFloat {
+        return CGFloat(Float(arc4random()) / Float(UINT32_MAX)) * (upper - lower) + lower
+    }
+}
+
+extension UIView {
+    
+    var size: CGSize {
+        get {
+            return self.frame.size
+        } set(value) {
+            self.frame.size = value
+        }
+    }
+    
+    
+    var zeroPointRect: CGRect {
+        return CGRect.init(x: 0, y: 0, w: self.w, h: self.h)
+    }
+    
+    var x: CGFloat {
+        get {
+            return self.frame.origin.x
+        } set(value) {
+            self.frame.origin.x = value
+        }
+    }
+    
+    var y: CGFloat {
+        get {
+            return self.frame.origin.y
+        } set(value) {
+            self.frame.origin.y = value
+        }
+    }
+    
+    var w: CGFloat {
+        get {
+            return self.frame.size.width
+        } set(value) {
+            self.frame.size.width = value
+        }
+    }
+    
+    var h: CGFloat {
+        get {
+            return self.frame.size.height
+        } set(value) {
+            self.frame.size.height = value
+        }
+    }
+    
+    var maxX: CGFloat {
+        return self.frame.maxX
+    }
+    
+    var maxY: CGFloat {
+        return self.frame.maxY
     }
 }
 

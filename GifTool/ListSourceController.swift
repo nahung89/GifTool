@@ -18,11 +18,13 @@ class ListSourceController: UIViewController {
     @IBOutlet weak var emojiStatusLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
     
-    let sourceUrl = "http://vtv-tool.vibbidi.com:3030/greeting/getList"
-    let emojisUrl = "https://api4.vibbidi.com/v5.0/emojis"
+    private let sourceUrl = "http://vtv-tool.vibbidi.com:3030/greeting/getList"
+    private let emojisUrl = "https://api4.vibbidi.com/v5.0/emojis"
     
-    var videos: [Video] = []
-    let disposeBag = DisposeBag()
+    private var videos: [Video] = []
+    private var emojis: [Emoji] = []
+    
+    private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,11 +35,21 @@ class ListSourceController: UIViewController {
         request()
         preloadGifs()
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard
+            segue.identifier == "generate",
+            let controller = segue.destination as? GenerateViewController,
+            let video = sender as? Video
+            else { return }
+        controller.set(video: video, emojis: emojis)
+    }
 }
 
 extension ListSourceController {
     
     func request() {
+        log.info("Request: \(sourceUrl)")
         RxAlamofire.requestJSON(.get, sourceUrl)
             .timeout(timeOutTime, scheduler: RxScheduler.shared.apiBackground)
             .map{ (r, json) in
@@ -54,12 +66,14 @@ extension ListSourceController {
                 self.videos = r
                 self.tableView.reloadData()
                 }, onError: { [unowned self] (error) in
-                    self.displayError(error)
+                    self.displayError(error.localizedDescription)
            }).disposed(by: disposeBag)
     }
     
     func preloadGifs() {
         emojiStatusLabel.text = "Loading Emojis..."
+        
+        log.info("Request: \(emojisUrl)")
         RxAlamofire.requestJSON(.get, emojisUrl)
             .timeout(timeOutTime, scheduler: RxScheduler.shared.apiBackground)
             .map{ (r, json) in
@@ -78,9 +92,10 @@ extension ListSourceController {
                 for one in r {
                     emojis += one.emojis
                 }
+                self.emojis = emojis
                 self.download(emojis: emojis)
                 }, onError: { [unowned self] (error) in
-                    self.displayError(error)
+                    self.displayError(error.localizedDescription)
             }).disposed(by: disposeBag)
     }
     
@@ -141,13 +156,18 @@ extension ListSourceController: UITableViewDataSource, UITableViewDelegate {
         cell.set(data: videos[indexPath.row])
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let video = videos[indexPath.row]
+        performSegue(withIdentifier: "generate", sender: video)
+    }
 }
 
 class PreviewSourceCell: UITableViewCell {
     
-    @IBOutlet var contentLabel: UILabel!
-    @IBOutlet var compiledBtn: UIButton!
-    @IBOutlet var completedBtn: UIButton!
+    @IBOutlet weak var contentLabel: UILabel!
+    @IBOutlet weak var compiledBtn: UIButton!
+    @IBOutlet weak var completedBtn: UIButton!
     
     
     override func awakeFromNib() {
@@ -162,8 +182,13 @@ class PreviewSourceCell: UITableViewCell {
         start: \(data.start) - end: \(data.end) - speed: \(data.commentSpeed)
         """
         
-        compiledBtn.backgroundColor = data.isComplied ? .green : .red
-        completedBtn.backgroundColor = data.isComplied ? .green : .red
+        if let isComplied = data.isComplied {
+            compiledBtn.backgroundColor = isComplied ? .green : .red
+        } else {
+            compiledBtn.backgroundColor = UIColor.lightGray
+        }
+        
+        completedBtn.backgroundColor = data.isCompleted ? .green : .red
     }
 }
 

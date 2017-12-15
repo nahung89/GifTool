@@ -42,6 +42,9 @@
 		11C37E0B1FE3605100DC263D /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C37E0A1FE3605100DC263D /* AppError.swift */; };
 		11C37E0D1FE3649B00DC263D /* RxScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C37E0C1FE3649B00DC263D /* RxScheduler.swift */; };
 		11E2576F1FE3817500601A1F /* Emoji.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2576E1FE3817500601A1F /* Emoji.swift */; };
+		11E257731FE3A64F00601A1F /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E257721FE3A64F00601A1F /* Comment.swift */; };
+		11E257751FE3A71500601A1F /* VideoComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E257741FE3A71500601A1F /* VideoComment.swift */; };
+		11E257781FE3AB9700601A1F /* CommentItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E257771FE3AB9700601A1F /* CommentItemView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -97,6 +100,9 @@
 		11C37E0A1FE3605100DC263D /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		11C37E0C1FE3649B00DC263D /* RxScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxScheduler.swift; sourceTree = "<group>"; };
 		11E2576E1FE3817500601A1F /* Emoji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emoji.swift; sourceTree = "<group>"; };
+		11E257721FE3A64F00601A1F /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		11E257741FE3A71500601A1F /* VideoComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoComment.swift; sourceTree = "<group>"; };
+		11E257771FE3AB9700601A1F /* CommentItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentItemView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +151,7 @@
 				11C37E0C1FE3649B00DC263D /* RxScheduler.swift */,
 				11C37E071FE3573500DC263D /* Entities */,
 				11C37E061FE3571900DC263D /* Controllers */,
+				11E257761FE3AB8700601A1F /* Views */,
 				11C37DF21FE350FE00DC263D /* Ultilities */,
 				110F6CF51FE28427004FA302 /* Main.storyboard */,
 				110F6CF81FE28427004FA302 /* Assets.xcassets */,
@@ -196,10 +203,20 @@
 			isa = PBXGroup;
 			children = (
 				11C37E081FE3579100DC263D /* Video.swift */,
+				11E257741FE3A71500601A1F /* VideoComment.swift */,
+				11E257721FE3A64F00601A1F /* Comment.swift */,
 				11E2576E1FE3817500601A1F /* Emoji.swift */,
 				11C37E0A1FE3605100DC263D /* AppError.swift */,
 			);
 			name = Entities;
+			sourceTree = "<group>";
+		};
+		11E257761FE3AB8700601A1F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				11E257771FE3AB9700601A1F /* CommentItemView.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,6 +231,7 @@
 				110F6CEC1FE28427004FA302 /* Resources */,
 				110F6D051FE28641004FA302 /* ShellScript */,
 				110F6D2A1FE290B5004FA302 /* Embed Frameworks */,
+				11E257791FE3C8AE00601A1F /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -309,6 +327,19 @@
 			shellPath = /bin/sh;
 			shellScript = "/usr/local/bin/carthage copy-frameworks";
 		};
+		11E257791FE3C8AE00601A1F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ERRORTAG=\"ERROR\"\nfind \"${SRCROOT}/$PROJECT_NAME\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($ERRORTAG).*\\$\" | perl -p -e \"s/($ERRORTAG)/ error: \\$1/\"\n\nif [ \"${CONFIGURATION}\" = \"Debug\" ]; then\nTAGS=\"TODO|FIXME\"\nfind \"${SRCROOT}/$PROJECT_NAME\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($TAGS).*\\$\" | perl -p -e \"s/($TAGS)/ warning: \\$1/\"\nfi";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -320,10 +351,13 @@
 				11C37E091FE3579100DC263D /* Video.swift in Sources */,
 				11C37E0D1FE3649B00DC263D /* RxScheduler.swift in Sources */,
 				11E2576F1FE3817500601A1F /* Emoji.swift in Sources */,
+				11E257751FE3A71500601A1F /* VideoComment.swift in Sources */,
 				110F6CF41FE28427004FA302 /* ListSourceController.swift in Sources */,
+				11E257731FE3A64F00601A1F /* Comment.swift in Sources */,
 				11C37DF41FE3510C00DC263D /* Const.swift in Sources */,
 				110F6D041FE284BA004FA302 /* GenerateViewController.swift in Sources */,
 				110F6CF21FE28427004FA302 /* AppDelegate.swift in Sources */,
+				11E257781FE3AB9700601A1F /* CommentItemView.swift in Sources */,
 				11C37E0B1FE3605100DC263D /* AppError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
