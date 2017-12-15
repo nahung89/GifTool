@@ -23,48 +23,10 @@ extension Optional {
 
 extension UILabel {
     
-    func setLineHeight(height: CGFloat) {
-        var txt: String = ""
-        if let t = self.text {
-            txt = t
-        }
-        
-        let paragrahStyle = NSMutableParagraphStyle.init()
-        paragrahStyle.minimumLineHeight = height
-        paragrahStyle.maximumLineHeight = height
-        
-        self.attributedText = NSAttributedString(string: txt,
-                                                 attributes: [NSAttributedStringKey.paragraphStyle : paragrahStyle])
-    }
-    
-    func setLineHeightCenter(height: CGFloat) {
-        var txt: String = ""
-        if let t = self.text {
-            txt = t
-        }
-        
-        let paragrahStyle = NSMutableParagraphStyle.init()
-        paragrahStyle.minimumLineHeight = height
-        paragrahStyle.maximumLineHeight = height
-        paragrahStyle.alignment = .center
-        
-        self.attributedText = NSAttributedString(string: txt,
-                                                 attributes: [NSAttributedStringKey.paragraphStyle : paragrahStyle])
-        
-    }
-    
-    
     func set(font: UIFont, color: UIColor, text: String) {
         self.font = font
         self.textColor = color
         self.text = text
-    }
-}
-
-extension UIView {
-    
-    @objc convenience init(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) {
-        self.init(frame: CGRect(x: x, y: y, width: w, height: h))
     }
 }
 
@@ -80,78 +42,12 @@ extension UIViewController {
     }
 }
 
-extension CGRect {
-    
-    init(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) {
-        self.init(x: x, y: y, width: w, height: h)
-    }
-}
-
-extension CGSize {
-    var w: CGFloat {
-        get {
-            return self.width
-        } set(value) {
-            self.width = value
-        }
-    }
-    
-    var h: CGFloat {
-        get {
-            return self.height
-        } set(value) {
-            self.height = value
-        }
-    }
-}
-
-extension CGRect {
-    
-    var x: CGFloat {
-        get {
-            return self.origin.x
-        } set(value) {
-            self.origin.x = value
-        }
-    }
-    
-    var y: CGFloat {
-        get {
-            return self.origin.y
-        } set(value) {
-            self.origin.y = value
-        }
-    }
-    
-    var w: CGFloat {
-        get {
-            return self.size.width
-        } set(value) {
-            self.size.width = value
-        }
-    }
-    
-    var h: CGFloat {
-        get {
-            return self.size.height
-        } set(value) {
-            self.size.height = value
-        }
-    }
-    
-}
-
 extension UIView {
     
     public func removeAllSubview() {
-        for (_, v) in self.subviews.enumerated() {
-            v.removeFromSuperview()
-        }
+        subviews.forEach({ $0.removeFromSuperview() })
     }
-}
 
-extension UIView {
-    
     func makeColor(includeSelf: Bool = false) {
         if includeSelf {
             self.backgroundColor = UIColor.random()
@@ -176,62 +72,6 @@ extension UIColor {
 private extension CGFloat {
     static func random(_ lower: CGFloat = 0, _ upper: CGFloat = 1) -> CGFloat {
         return CGFloat(Float(arc4random()) / Float(UINT32_MAX)) * (upper - lower) + lower
-    }
-}
-
-extension UIView {
-    
-    var size: CGSize {
-        get {
-            return self.frame.size
-        } set(value) {
-            self.frame.size = value
-        }
-    }
-    
-    
-    var zeroPointRect: CGRect {
-        return CGRect.init(x: 0, y: 0, w: self.w, h: self.h)
-    }
-    
-    var x: CGFloat {
-        get {
-            return self.frame.origin.x
-        } set(value) {
-            self.frame.origin.x = value
-        }
-    }
-    
-    var y: CGFloat {
-        get {
-            return self.frame.origin.y
-        } set(value) {
-            self.frame.origin.y = value
-        }
-    }
-    
-    var w: CGFloat {
-        get {
-            return self.frame.size.width
-        } set(value) {
-            self.frame.size.width = value
-        }
-    }
-    
-    var h: CGFloat {
-        get {
-            return self.frame.size.height
-        } set(value) {
-            self.frame.size.height = value
-        }
-    }
-    
-    var maxX: CGFloat {
-        return self.frame.maxX
-    }
-    
-    var maxY: CGFloat {
-        return self.frame.maxY
     }
 }
 
@@ -276,74 +116,4 @@ public extension UIDevice {
         default:                                        return identifier
         }
     }
-    
-    public class func isOldDevice() -> Bool {
-        let modelName = UIDevice().modelName
-        switch modelName {
-        case "Simulator",
-             "iPhone 4",
-             "iPhone 4s",
-             "iPhone 5",
-             "iPhone 5c",
-             "iPhone 5s",
-             "iPhone 6",
-             "iPhone 6 Plus",
-             "iPhone 6s",
-             "iPhone 6s Plus":
-            return true
-        default:
-            return false
-        }
-    }
-
-    public enum Versions: Float {
-        case five = 5.0
-        case six = 6.0
-        case seven = 7.0
-        case eight = 8.0
-        case nine = 9.0
-        case ten = 10.0
-    }
-    
-    public class func systemVersion() -> String {
-        return UIDevice.current.systemVersion
-    }
-    
-    public class func systemFloatVersion() -> Float {
-        return (systemVersion() as NSString).floatValue
-    }
-    
-    public class func isVersion(_ version: Versions) -> Bool {
-        return systemFloatVersion() >= version.rawValue && systemFloatVersion() < (version.rawValue + 1.0)
-    }
-    
-    public class func isVersionOrLater(_ version: Versions) -> Bool {
-        return systemFloatVersion() >= version.rawValue
-    }
-    
-    public class func isVersionOrEarlier(_ version: Versions) -> Bool {
-        return systemFloatVersion() < (version.rawValue + 1.0)
-    }
-    
-    public class var CURRENT_VERSION: String {
-        return "\(systemFloatVersion())"
-    }
-    
-    public class func isOS10Later() -> Bool {
-        return isVersionOrLater(.ten)
-    }
-    
-    static let isIphoneX: Bool = {
-        // iPhoneX is alway iOS 11 later
-        guard #available(iOS 11.0, *),
-            UIDevice.current.userInterfaceIdiom == .phone else {
-                return false
-        }
-        let nativeSize = UIScreen.main.nativeBounds.size
-        let (w, h) = (nativeSize.width, nativeSize.height)
-        let (d1, d2): (CGFloat, CGFloat) = (1125.0, 2436.0)
-        
-        return (w == d1 && h == d2) || (w == d2 && h == d1)
-    }()
-    
 }

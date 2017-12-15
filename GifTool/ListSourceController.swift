@@ -14,9 +14,9 @@ import Kingfisher
 
 class ListSourceController: UIViewController {
 
-    @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emojiStatusLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var tableView: UITableView!
     
     private let sourceUrl = "http://vtv-tool.vibbidi.com:3030/greeting/getList"
     private let emojisUrl = "https://api4.vibbidi.com/v5.0/emojis"
@@ -125,21 +125,6 @@ extension ListSourceController {
             
         imageFetcher.maxConcurrentDownloads = 10
         imageFetcher.start()
-    
-//        for url in urls {
-//            KingfisherManager.shared.retrieveImage(with: url, options: [.downloadPriority(1.0)], progressBlock: nil, completionHandler: { (image, error, cache, url) in
-//                if let _ = image, error == nil {
-//                    completed += 1
-//                    log.info("Complete: \(completed / Float(urls.count) * 100)%")
-//                } else {
-//                    log.error("Fail to load url: \(url.logable) - \(error.logable)")
-//                }
-//                DispatchQueue.main.async {
-//                    self.progressView.progress = completed / Float(urls.count)
-//                    self.navigationItem.title = "Loading Emojis: \(self.progressView.progress * 100)%"
-//                }
-//            })
-//        }
     }
 }
 
@@ -163,34 +148,6 @@ extension ListSourceController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-class PreviewSourceCell: UITableViewCell {
-    
-    @IBOutlet weak var contentLabel: UILabel!
-    @IBOutlet weak var compiledBtn: UIButton!
-    @IBOutlet weak var completedBtn: UIButton!
-    
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-    
-    func set(data: Video) {
-        contentLabel.text =
-        """
-        id: \(data.id)
-        title: \(data.title) - artist: \(data.artist) - cat: \(data.category)
-        start: \(data.start) - end: \(data.end) - speed: \(data.commentSpeed)
-        """
-        
-        if let isComplied = data.isComplied {
-            compiledBtn.backgroundColor = isComplied ? .green : .red
-        } else {
-            compiledBtn.backgroundColor = UIColor.lightGray
-        }
-        
-        completedBtn.backgroundColor = data.isCompleted ? .green : .red
-    }
-}
 
 
 

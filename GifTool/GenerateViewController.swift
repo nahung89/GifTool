@@ -32,33 +32,34 @@ class GenerateViewController: UIViewController {
     }
     
     func set(video: Video, emojis: [Emoji]) {
-        videoId = video.id
         navigationItem.title = video.title
+        self.videoId = video.id
         self.emojis = emojis
     }
     
     func reloadData() {
         guard let videoComment = videoComment else { return }
         
-        // Config video area
+        guard !videoComment.comments.isEmpty else {
+            displayError("Has no comment...")
+            return
+        }
+        
+        // Update video area
         videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
         videoArea.layoutIfNeeded()
         
-        // Config comment
+        // Play comments
         for comment in videoComment.comments {
             let commentParts = CommentPart.parse(comment.content, emojis)
             
             let commentView = CommentItemView(scale: 1.0)
             commentView.setCommentParts(commentParts)
-            commentView.frame.origin = CGPoint(x: videoArea.w, y: CGFloat(comment.row) * CommentItemView.Design.height)
+            commentView.frame.origin = CGPoint(x: videoArea.frame.width, y: CGFloat(comment.row) * CommentItemView.Design.height)
             // commentView.makeColor(includeSelf: true) // ERROR
             
             videoArea.addSubview(commentView)
             commentView.animate(speed: videoComment.video.commentSpeed, delay: comment.startAt)
-        }
-        
-        if videoComment.comments.isEmpty {
-            displayError("Has no comment...")
         }
     }
 }

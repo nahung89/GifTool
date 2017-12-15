@@ -25,7 +25,7 @@ class CommentItemView: UIView {
     
     init(scale: CGFloat) {
         self.scale = scale
-        let frame = CGRect(x: 0, y: 0, w: 0, h: Design.height * scale)
+        let frame = CGRect(x: 0, y: 0, width: 0, height: Design.height * scale)
         super.init(frame: frame)
         initView()
     }
@@ -37,7 +37,7 @@ class CommentItemView: UIView {
     private func initView() {
         let designFont = Design.font
         textFont = designFont.withSize(designFont.pointSize * scale)
-        emojiHeight = h * 88 / 100
+        emojiHeight = frame.height * 88 / 100
     }
     
     func setCommentParts(_ parts: [CommentPart]) {
@@ -48,13 +48,13 @@ class CommentItemView: UIView {
             switch part {
             case let .emoji(emoji):
                 let ih = emojiHeight
-                let iw = ih * emoji.size.w / emoji.size.h
-                let iy = (h - ih) / 2
+                let iw = ih * emoji.size.width / emoji.size.height
+                let iy = (frame.height - ih) / 2
                 
-                let imageView = UIImageView(frame: CGRect(x: maxX, y: iy, w: iw, h: ih))
+                let imageView = UIImageView(frame: CGRect(x: maxX, y: iy, width: iw, height: ih))
                 imageView.contentMode = .scaleAspectFill
                 addSubview(imageView)
-                maxX += imageView.w
+                maxX += imageView.frame.width
                 
                 if ImageCache.default.imageCachedType(forKey: emoji.path).cached == true {
                     let path = ImageCache.default.cachePath(forKey: emoji.path)
@@ -67,26 +67,26 @@ class CommentItemView: UIView {
                 }
                 
             case let .text(message):
-                let label = UILabel(x: maxX, y: 0, w: 0, h: h)
+                let label = UILabel(frame: CGRect(x: maxX, y: 0, width: 0, height: frame.height))
                 label.set(font: textFont, color: .white, text: message)
                 label.sizeToFit()
-                label.h = h
+                label.frame.size.height = frame.height
                 addSubview(label)
-                maxX += label.w
+                maxX += label.frame.width
             }
         }
-        w = maxX
+        frame.size.width = maxX
     }
     
     func duration(speed: TimeInterval, width: CGFloat) -> TimeInterval {
-        return speed + Double(w / width) * speed
+        return speed + Double(frame.width / width) * speed
     }
     
     func animate(speed: TimeInterval, delay: TimeInterval) {
         guard let superview = self.superview else { return }
-        let duration = self.duration(speed: speed, width: superview.w)
+        let duration = self.duration(speed: speed, width: superview.frame.width)
         UIView.animate(withDuration: duration, delay: delay, options: [.curveLinear, .allowUserInteraction], animations: {
-            self.x = -self.w
+            self.frame.origin.x = -self.frame.width
         }) { _ in
             self.removeFromSuperview()
         }
