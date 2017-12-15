@@ -22,7 +22,7 @@ class ListSourceController: UIViewController {
     private let emojisUrl = "https://api4.vibbidi.com/v5.0/emojis"
     
     private var videos: [Video] = []
-    private var emojis: [Emoji] = []
+    static private(set) var emojis: [Emoji] = []
     
     private let disposeBag = DisposeBag()
     
@@ -42,7 +42,7 @@ class ListSourceController: UIViewController {
             let controller = segue.destination as? GenerateViewController,
             let video = sender as? Video
             else { return }
-        controller.set(video: video, emojis: emojis)
+        controller.set(video: video)
     }
 }
 
@@ -92,7 +92,7 @@ extension ListSourceController {
                 for one in r {
                     emojis += one.emojis
                 }
-                self.emojis = emojis
+                ListSourceController.emojis = emojis
                 self.download(emojis: emojis)
                 }, onError: { [unowned self] (error) in
                     self.displayError(error.localizedDescription)
