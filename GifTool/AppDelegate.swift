@@ -8,6 +8,8 @@
 
 import UIKit
 import Kingfisher
+import AVFoundation
+import Photos
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,6 +22,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // ImageCache.default.clearDiskCache()
         ImageCache.default.maxMemoryCost = 1
         ImageDownloader.default.downloadTimeout = 30.0
+        
+        // Register for playing sound
+        try! AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: [])
+        
+        // Request to save video to CameraRoll
+        PHPhotoLibrary.requestAuthorization { (status) in
+            
+        }
         
         return true
     }

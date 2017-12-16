@@ -13,9 +13,12 @@ import Unbox
 import Kingfisher
 import Alamofire
 import AVKit
+import AssetsLibrary
+import Photos
 
 class GenerateViewController: UIViewController {
     
+    private let playerView = VideoPlayerView()
     @IBOutlet weak var videoArea: UIView!
     @IBOutlet weak var videoHeightConstraint: NSLayoutConstraint!
     
@@ -25,11 +28,14 @@ class GenerateViewController: UIViewController {
     private(set) var videoId: String?
     
     private var videoComment: VideoComment?
+    private var commentsQueue: [Comment] = []
+    
     private var videoMerge: VideoMerge?
     private var request: Alamofire.DownloadRequest?
     
     private let exportProgress: Variable<Float> = Variable(0)
     
+    private var playerDisposeBag = DisposeBag()
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -45,50 +51,50 @@ class GenerateViewController: UIViewController {
     }
     
     func reloadData() {
-        guard let videoComment = videoComment else { return }
+        guard let videoComment = videoComment else {
+            exportLabel.text = "Error. No data"
+            return
+        }
         
         guard !videoComment.comments.isEmpty else {
             exportLabel.text = "Error. Has no comment..."
             return
         }
         
-        // Update video area
-        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
-        videoArea.layoutIfNeeded()
-        
-        // Play comments
-        for comment in videoComment.comments {
-            let commentParts = CommentPart.parse(comment.content, ListSourceController.emojis)
-            
-            let commentView = CommentItemView(scale: 1.0)
-            commentView.setCommentParts(commentParts)
-            commentView.frame.origin = CGPoint(x: videoArea.frame.width, y: CGFloat(comment.row) * CommentItemView.Design.height)
-            
-            videoArea.addSubview(commentView)
-            commentView.animate(speed: videoComment.video.commentSpeed, delay: comment.startAt)
+        if  let videoUrl = URL(string: videoComment.video.videoPath),
+            let exportDirectoryUrl = createExportDirectory() {
+            let exportUrl = exportDirectoryUrl.appendingPathComponent(videoUrl.lastPathComponent)
+            if FileManager.default.fileExists(atPath: exportUrl.path) {
+                playExportedVideo(exportUrl)
+                return
+            }
         }
         
-        download(videoPath: videoComment.video.videoPath)
+        if let downloadedUrl = download(videoPath: videoComment.video.videoPath) {
+            playDownloadVideo(downloadedUrl)
+            return
+        }
     }
     
-    func download(videoPath: String) {
+    func download(videoPath: String) -> URL? {
         
         guard let loadUrl = URL(string: videoPath) else {
             exportLabel.text = "Error. Invalid Url: \(videoPath)"
-            return
+            return nil
         }
         
         guard let saveUrl = createDownloadDirectory()?.appendingPathComponent(loadUrl.lastPathComponent) else {
             exportLabel.text = "Error. Can't find cache directory"
-            return
+            return nil
         }
         
         if FileManager.default.fileExists(atPath: saveUrl.path) {
             process(saveUrl)
-            return
+            return saveUrl
         }
         
         request(loadURL: loadUrl, saveURL: saveUrl)
+        return nil
     }
     
     func process(_ cacheVideoUrl: URL) {
@@ -120,16 +126,113 @@ class GenerateViewController: UIViewController {
                 """
                 
                 if error == nil, let url = self?.videoMerge?.exportedUrl {
-                    let player = AVPlayerViewController()
-                    player.player = AVPlayer(url: url)
-                    self?.present(player, animated: true, completion: {
-                        player.player?.play()
-                    })
+                    self?.saveToCamera(url)
+                    self?.playExportedVideo(url)
                 }
         })
     }
 }
 
+extension GenerateViewController {
+    
+    @IBAction func reset() {
+        guard let videoComment = videoComment else {
+            exportLabel.text = "Error. No data"
+            return
+        }
+        
+        guard !videoComment.comments.isEmpty else {
+            exportLabel.text = "Error. Has no comment..."
+            return
+        }
+        
+        if  let videoUrl = URL(string: videoComment.video.videoPath),
+            let exportDirectoryUrl = createExportDirectory() {
+            let exportUrl = exportDirectoryUrl.appendingPathComponent(videoUrl.lastPathComponent)
+            try? FileManager.default.removeItem(at: exportUrl)
+        }
+        
+        playerView.suspend()
+        videoArea.removeAllSubview()
+        playerDisposeBag = DisposeBag()
+        _ = download(videoPath: videoComment.video.videoPath)
+    }
+    
+    func saveToCamera(_ exportedUrl: URL) {
+        let isVideoCompatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(exportedUrl.path)
+        log.info("VideoCompatible: \(isVideoCompatible)")
+        
+        PHPhotoLibrary.shared().performChanges({
+            _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportedUrl)
+        }, completionHandler: { (success, error) in
+            log.info("Save Camera Roll: \(success) - error")
+        })
+    }
+}
+
+private extension GenerateViewController {
+    
+    func playExportedVideo(_ exportUrl: URL) {
+        guard let videoComment = videoComment else { return }
+        
+        videoArea.removeAllSubview()
+        
+        // Update video area
+        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
+        view.layoutIfNeeded()
+        playerView.frame = videoArea.bounds
+        videoArea.addSubview(playerView)
+        
+        playerDisposeBag = DisposeBag()
+        playerView.setURL(exportUrl, showMark: false)
+    }
+    
+    func playDownloadVideo(_ downloadUrl: URL) {
+        guard let videoComment = videoComment else { return }
+        
+        // Update video area
+        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
+        videoArea.layoutIfNeeded()
+        playerView.frame = videoArea.bounds
+        videoArea.addSubview(playerView)
+        
+        playerDisposeBag = DisposeBag()
+        playerView.progress.asDriver().drive(onNext: { [unowned self] (progress) in
+            if let time = progress {
+                guard let comment = self.dequeueComment(time) else { return }
+                self.show(comment: comment)
+            } else {
+                self.commentsQueue = videoComment.comments
+                self.videoArea.removeAllSubview()
+            }
+        }).disposed(by: playerDisposeBag)
+        
+        playerView.setURL(downloadUrl, showMark: true)
+    }
+
+    func dequeueComment(_ time: TimeInterval) -> Comment? {
+        for (idx, comment) in commentsQueue.enumerated() {
+            if comment.startAt > time && comment.startAt < time + 0.1 {
+                commentsQueue.remove(at: idx)
+                return comment
+            }
+        }
+        return nil
+    }
+    
+    func show(comment: Comment) {
+        guard let videoComment = videoComment else { return }
+        
+        let commentParts = CommentPart.parse(comment.content, ListSourceController.emojis)
+        
+        let commentView = CommentItemView(scale: 1.0)
+        commentView.setCommentParts(commentParts)
+        commentView.frame.origin = CGPoint(x: videoArea.frame.width, y: CGFloat(comment.row) * CommentItemView.Design.height)
+        
+        videoArea.addSubview(commentView)
+        commentView.animate(speed: videoComment.video.commentSpeed, delay: 0)
+    }
+}
 extension GenerateViewController {
     
     func request(id: String) {

@@ -27,6 +27,6 @@ extension Comment: Unboxable {
         
         self.content = try u.unbox(key: "Comment")
         self.startAt = try u.unbox(key: "Sec")
-        self.row = try u.unbox(key: "Row") - 1 // ERROR: Check with product team
+        self.row = try u.unbox(key: "Row")
     }
 }
