@@ -19,8 +19,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="O8U-Zh-IEv">
-                                <rect key="frame" x="0.0" y="114" width="375" height="553"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="O8U-Zh-IEv">
+                                <rect key="frame" x="0.0" y="170" width="375" height="497"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" rowHeight="152" id="8It-J3-fNo" customClass="PreviewSourceCell" customModule="GifTool" customModuleProvider="target">
@@ -103,16 +103,23 @@
                                     <constraint firstItem="AxB-bX-pYL" firstAttribute="leading" secondItem="Kgn-4b-S5J" secondAttribute="leading" constant="15" id="yXj-1n-K7t"/>
                                 </constraints>
                             </view>
+                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="BKh-LT-3or">
+                                <rect key="frame" x="0.0" y="114" width="375" height="56"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" red="0.61360468619956365" green="0.90302938111555531" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="BKh-LT-3or" firstAttribute="top" secondItem="Kgn-4b-S5J" secondAttribute="bottom" id="3SA-6o-dGg"/>
                             <constraint firstItem="O8U-Zh-IEv" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="DPi-zh-ccj"/>
                             <constraint firstItem="Kgn-4b-S5J" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="FvC-ih-KC8"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="O8U-Zh-IEv" secondAttribute="bottom" id="KKj-cJ-Nds"/>
-                            <constraint firstItem="O8U-Zh-IEv" firstAttribute="top" secondItem="Kgn-4b-S5J" secondAttribute="bottom" id="XUx-5a-K6P"/>
+                            <constraint firstItem="BKh-LT-3or" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="Wjd-rf-hI3"/>
+                            <constraint firstItem="O8U-Zh-IEv" firstAttribute="top" secondItem="BKh-LT-3or" secondAttribute="bottom" id="XUx-5a-K6P"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Kgn-4b-S5J" secondAttribute="trailing" id="fDf-uo-f6Z"/>
                             <constraint firstItem="O8U-Zh-IEv" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="nzc-7M-63V"/>
                             <constraint firstItem="Kgn-4b-S5J" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="oBE-ZB-Yh1"/>
+                            <constraint firstItem="BKh-LT-3or" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="zqC-1w-F1Y"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
@@ -120,6 +127,7 @@
                     <connections>
                         <outlet property="emojiStatusLabel" destination="AxB-bX-pYL" id="Mfc-et-Eo3"/>
                         <outlet property="progressView" destination="tLN-IX-pU3" id="ZoD-L2-Q6K"/>
+                        <outlet property="searchBar" destination="BKh-LT-3or" id="P01-1R-q2t"/>
                         <outlet property="tableView" destination="O8U-Zh-IEv" id="Fpa-AJ-Yz7"/>
                         <segue destination="ABM-mw-8yg" kind="show" identifier="generate" id="0Wt-zv-6OT"/>
                     </connections>

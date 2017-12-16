@@ -16,12 +16,14 @@ class ListSourceController: UIViewController {
 
     @IBOutlet weak var emojiStatusLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     
     private let sourceUrl = "http://vtv-tool.vibbidi.com:3030/greeting/getList"
     private let emojisUrl = "https://api4.vibbidi.com/v5.0/emojis"
     
     private var videos: [Video] = []
+    private var filterVideos: [Video] = []
     static private(set) var emojis: [Emoji] = []
     
     private let disposeBag = DisposeBag()
@@ -34,6 +36,23 @@ class ListSourceController: UIViewController {
         
         request()
         preloadGifs()
+        
+        searchBar.rx.text
+            .orEmpty
+            .throttle(0.5, scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+            .subscribe(onNext: { [unowned self] (value) in
+                if value.isEmpty {
+                    self.filterVideos = self.videos
+                } else {
+                    self.filterVideos = self.videos.filter({ $0.title.contains(value) ||
+                        $0.id.contains(value) ||
+                        $0.artist.contains(value)
+                    })
+                }
+                self.tableView.reloadData()
+            })
+            .disposed(by: disposeBag)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -64,6 +83,7 @@ extension ListSourceController {
             .observeOn(RxScheduler.shared.main)
             .subscribe(onNext: { [unowned self] (r: [Video]) in
                 self.videos = r
+                self.filterVideos = self.videos
                 self.tableView.reloadData()
                 }, onError: { [unowned self] (error) in
                     self.displayError(error.localizedDescription)
@@ -131,19 +151,19 @@ extension ListSourceController {
 extension ListSourceController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return videos.count
+        return filterVideos.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as? PreviewSourceCell else {
             return UITableViewCell()
         }
-        cell.set(data: videos[indexPath.row])
+        cell.set(data: filterVideos[indexPath.row])
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let video = videos[indexPath.row]
+        let video = filterVideos[indexPath.row]
         performSegue(withIdentifier: "generate", sender: video)
     }
 }
