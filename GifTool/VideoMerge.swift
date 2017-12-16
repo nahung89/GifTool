@@ -31,6 +31,7 @@ class VideoMerge {
     private var brushImage: UIImage?
     private var overlayViews: [UIView] = []
     
+    private var cacheDirectoryUrl: URL
     private var exportSession: AVAssetExportSession?
     
     private var progressBlock: VideoExportProgressBlock?
@@ -39,10 +40,10 @@ class VideoMerge {
     private let kDisplayWidth: CGFloat = UIScreen.main.bounds.width
     private let kExportWidth: CGFloat = 1024
     
-    init(videoUrl: URL, source: VideoComment, brushImage: UIImage?) {
+    init(videoUrl: URL, source: VideoComment, cacheDirectoryUrl: URL) {
         self.videoUrl = videoUrl
         self.source = source
-        self.brushImage = brushImage
+        self.cacheDirectoryUrl = cacheDirectoryUrl
     }
     
     deinit {
@@ -166,8 +167,11 @@ private extension VideoMerge {
         let outputVideoInstruction = createVideoLayerInstruction(asset: asset, videoCompositionTrack: videoCompositionTrack)
         
         // Output composition instruction
+        let start = CMTimeMakeWithSeconds(0, asset.duration.timescale)
+        let duration = CMTimeMakeWithSeconds(source.video.end - source.video.start, asset.duration.timescale)
+        let range = CMTimeRangeMake(start, duration)
         let outputCompositionInstruction = AVMutableVideoCompositionInstruction()
-        outputCompositionInstruction.timeRange = CMTimeRangeMake(kCMTimeZero, asset.duration)
+        outputCompositionInstruction.timeRange = range
         outputCompositionInstruction.layerInstructions = [outputVideoInstruction]
         
         let naturalSize = videoCompositionTrack.naturalSize
@@ -189,8 +193,8 @@ private extension VideoMerge {
         }
         
         exportSession.videoComposition = outputComposition
-        exportSession.outputFileType = AVFileType.mov
-        exportSession.outputURL = createCacheURL()
+        exportSession.outputFileType = AVFileType.mp4
+        exportSession.outputURL = createExportFileURL()
         exportSession.shouldOptimizeForNetworkUse = true
         return exportSession
     }
@@ -212,7 +216,10 @@ private extension VideoMerge {
         }
         
         do {
-            try compositionTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, asset.duration), of: assetTrack, at: kCMTimeZero)
+            let start = CMTimeMakeWithSeconds(source.video.start, asset.duration.timescale)
+            let duration = CMTimeMakeWithSeconds(source.video.end - source.video.start, asset.duration.timescale)
+            let range = CMTimeRangeMake(start, duration)
+            try compositionTrack.insertTimeRange(range, of: assetTrack, at: kCMTimeZero)
         } catch {
             inputComposition.removeTrack(compositionTrack)
             return nil
@@ -233,7 +240,10 @@ private extension VideoMerge {
         }
         
         do {
-            try compositionTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, asset.duration), of: assetTrack, at: kCMTimeZero)
+            let start = CMTimeMakeWithSeconds(source.video.start, asset.duration.timescale)
+            let duration = CMTimeMakeWithSeconds(source.video.end - source.video.start, asset.duration.timescale)
+            let range = CMTimeRangeMake(start, duration)
+            try compositionTrack.insertTimeRange(range, of: assetTrack, at: kCMTimeZero)
         } catch {
             inputComposition.removeTrack(compositionTrack)
             return nil
@@ -262,7 +272,7 @@ private extension VideoMerge {
         overlayLayer.frame = videoFrame
         overlayLayer.masksToBounds = true
         
-        let composeHeight = videoFrame.height * kDisplayWidth / videoFrame.width
+        // let composeHeight = videoFrame.height * kDisplayWidth / videoFrame.width
         let scale: CGFloat = videoFrame.width / kDisplayWidth
         
         let texts = source.comments
@@ -313,14 +323,16 @@ private extension VideoMerge {
 
 private extension VideoMerge {
     
-    func createCacheURL() -> URL {
-        let documentDirFileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let outputFileName = ProcessInfo.processInfo.globallyUniqueString
-        let cacheURL = documentDirFileURL.appendingPathComponent("mergeVideo-\(outputFileName).mov")
+    func createExportFileURL() -> URL {
+        if !FileManager.default.fileExists(atPath: cacheDirectoryUrl.path) {
+                try? FileManager.default.createDirectory(at: cacheDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
+                try? FileManager.default.setAttributes([FileAttributeKey.protectionKey: FileProtectionType.none], ofItemAtPath: cacheDirectoryUrl.path)
+        }
         
-        // Remove existing cache at url if has any
-        try? FileManager.default.removeItem(at: cacheURL)
-        return cacheURL
+        let fileUrl = cacheDirectoryUrl.appendingPathComponent(videoUrl.lastPathComponent)
+        try? FileManager.default.removeItem(at: fileUrl)
+        
+        return fileUrl
     }
     
     func createPreviewDataFrom(videoUrl: URL) throws -> Data? {

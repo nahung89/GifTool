@@ -15,7 +15,7 @@ import Alamofire
 import AVKit
 
 class GenerateViewController: UIViewController {
- 
+    
     @IBOutlet weak var videoArea: UIView!
     @IBOutlet weak var videoHeightConstraint: NSLayoutConstraint!
     
@@ -26,6 +26,7 @@ class GenerateViewController: UIViewController {
     
     private var videoComment: VideoComment?
     private var videoMerge: VideoMerge?
+    private var request: Alamofire.DownloadRequest?
     
     private let exportProgress: Variable<Float> = Variable(0)
     
@@ -47,7 +48,7 @@ class GenerateViewController: UIViewController {
         guard let videoComment = videoComment else { return }
         
         guard !videoComment.comments.isEmpty else {
-            displayError("Has no comment...")
+            exportLabel.text = "Error. Has no comment..."
             return
         }
         
@@ -62,28 +63,23 @@ class GenerateViewController: UIViewController {
             let commentView = CommentItemView(scale: 1.0)
             commentView.setCommentParts(commentParts)
             commentView.frame.origin = CGPoint(x: videoArea.frame.width, y: CGFloat(comment.row) * CommentItemView.Design.height)
-            // commentView.makeColor(includeSelf: true) // ERROR
             
             videoArea.addSubview(commentView)
             commentView.animate(speed: videoComment.video.commentSpeed, delay: comment.startAt)
         }
         
-        // ERROR
-        // download(videoPath: videoComment.video.videoPath)
-        
-        let videoUrl = Bundle.main.url(forResource: "test_video", withExtension: "mp4")!
-        process(videoUrl)
+        download(videoPath: videoComment.video.videoPath)
     }
     
     func download(videoPath: String) {
         
         guard let loadUrl = URL(string: videoPath) else {
-            displayError("Invalid Url: \(videoPath)")
+            exportLabel.text = "Error. Invalid Url: \(videoPath)"
             return
         }
         
-        guard let saveUrl = getCacheDirectory()?.appendingPathComponent(loadUrl.lastPathComponent) else {
-            displayError("Can't find cache directory")
+        guard let saveUrl = createDownloadDirectory()?.appendingPathComponent(loadUrl.lastPathComponent) else {
+            exportLabel.text = "Error. Can't find cache directory"
             return
         }
         
@@ -92,22 +88,21 @@ class GenerateViewController: UIViewController {
             return
         }
         
-        log.info("Load: \(loadUrl)")
-        log.info("Save: \(saveUrl)")
-        
         request(loadURL: loadUrl, saveURL: saveUrl)
-            .subscribe(onNext: { (url) in
-                log.info("Url: \(url.logable)")
-            }).disposed(by: disposeBag)
     }
     
     func process(_ cacheVideoUrl: URL) {
         guard let videoComment = videoComment else {
-            displayError("VideoComment empty")
+            exportLabel.text = "Error. Data empty"
             return
         }
         
-        videoMerge = VideoMerge(videoUrl: cacheVideoUrl, source: videoComment, brushImage: nil)
+        guard let exportDirectoryUrl = createExportDirectory() else {
+            exportLabel.text = "Error. Can't find export directory"
+            return
+        }
+        
+        videoMerge = VideoMerge(videoUrl: cacheVideoUrl, source: videoComment, cacheDirectoryUrl: exportDirectoryUrl)
         
         let begin = Date()
         videoMerge?.startExportVideo(onProgress: { [weak self] (progress) in
@@ -160,55 +155,77 @@ extension GenerateViewController {
             }).disposed(by: disposeBag)
     }
     
-    func request(loadURL: URL, saveURL: URL) -> Observable<URL?> {
-        return Observable.create { observer in
-            let destination: DownloadRequest.DownloadFileDestination = { _, _ in
-                return (saveURL, [.removePreviousFile, .createIntermediateDirectories])
-            }
-            
-            let request = Alamofire.download(loadURL, to: destination)
-                .downloadProgress{ progress in
-                    // log.debug("Progress: \(progress) - \(progress.fractionCompleted)")
-                }
-                .response { response in
-                    if let err = response.error {
-                        log.error("Error: \(err.localizedDescription)")
-                        observer.onError(err)
-                    } else {
-                        log.info("Completed")
-                        observer.onNext(response.destinationURL)
-                        observer.onCompleted()
-                    }
-            }
-            
-            request.resume()
-            
-            return Disposables.create {
-                log.warning("Cancel")
-                request.cancel()
-            }
+    func request(loadURL: URL, saveURL: URL) {
+        log.info("Load: \(loadURL)")
+        log.info("Save: \(saveURL)")
+        
+        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+            return (saveURL, [.removePreviousFile, .createIntermediateDirectories])
         }
+        
+        request = Alamofire.download(loadURL, to: destination)
+            .downloadProgress{ progress in
+                DispatchQueue.main.async {
+                    self.exportLabel.text = "Downloading video: \(progress.fractionCompleted)..."
+                    self.progressView.progress = Float(progress.fractionCompleted)
+                }
+            }
+            .response { response in
+                if let err = response.error {
+                    DispatchQueue.main.async {
+                        self.exportLabel.text = "Error. Download fail: \(err.localizedDescription)"
+                        log.error("Error: \(err)")
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.exportLabel.text = "Download Completed."
+                        self.process(saveURL)
+                    }
+                }
+        }
+        
+        request?.resume()
     }
 }
 
 private extension GenerateViewController {
     
-    func getCacheDirectory() -> URL? {
+    func createDownloadDirectory() -> URL? {
         guard let documentDirectoryUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             return nil
         }
         
-        let cacheUrl = documentDirectoryUrl.appendingPathComponent("VideoCache", isDirectory: true)
+        let url = documentDirectoryUrl.appendingPathComponent("Download", isDirectory: true)
         
-        if !FileManager.default.fileExists(atPath: cacheUrl.path) {
+        if !FileManager.default.fileExists(atPath: url.path) {
             do {
-                try FileManager.default.createDirectory(at: cacheUrl, withIntermediateDirectories: true, attributes: nil)
-                try FileManager.default.setAttributes([FileAttributeKey.protectionKey: FileProtectionType.none], ofItemAtPath: cacheUrl.path)
+                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.setAttributes([FileAttributeKey.protectionKey: FileProtectionType.none], ofItemAtPath: url.path)
             } catch {
                 log.error("Error: \(error)")
                 return nil
             }
         }
-        return cacheUrl
+        return url
+    }
+    
+    func createExportDirectory() -> URL? {
+        guard let documentDirectoryUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        
+        let url = documentDirectoryUrl.appendingPathComponent("Export", isDirectory: true)
+        
+        if !FileManager.default.fileExists(atPath: url.path) {
+            do {
+                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.setAttributes([FileAttributeKey.protectionKey: FileProtectionType.none], ofItemAtPath: url.path)
+            } catch {
+                log.error("Error: \(error)")
+                return nil
+            }
+        }
+        return url
     }
 }
+
