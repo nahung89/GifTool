@@ -9,18 +9,21 @@
 import Foundation
 import UIKit
 
-class WatermarkView: UILabel {
+class WatermarkView: UIView {
+    
+    let label = UILabel()
+    let imageView = UIImageView()
     
     struct Design {
-        static let height: CGFloat = 23
-        static let font: UIFont = UIFont.systemFont(ofSize: 13)
+        static let font: UIFont = UIFont.FontMedium(8)
+        static let logoHeight: CGFloat = 16
     }
     
     private let scale: CGFloat
     
     init(scale: CGFloat = 1) {
         self.scale = scale
-        super.init(frame: CGRect(x: 0, y: 0, width: 0, height: Design.height * scale))
+        super.init(frame: CGRect(x: 0, y: 0, width: 0, height: CommentItemView.Design.height * scale))
         initView()
     }
     
@@ -29,19 +32,33 @@ class WatermarkView: UILabel {
     }
     
     func initView() {
-        textColor = .white
-        text = "VIBBIDI.com"
-        textAlignment = .center
-        backgroundColor = UIColor(white: 0, alpha: 0.25)
+        label.frame = CGRect(x: 0, y: 0, width: 0, height: CommentItemView.Design.height * scale)
+        label.textColor = .white
+        label.text = "vibbidi.com"
+        label.textAlignment = .right
         
         let designFont: UIFont = Design.font
         if scale == 1 {
-            font = designFont
+            label.font = designFont
         } else {
-            font = designFont.withSize(designFont.pointSize * scale)
+            label.font = designFont.withSize(designFont.pointSize * scale)
         }
-        sizeToFit()
-        frame.size.height = Design.height * scale
-        frame.size.width = frame.width * 84 / 68
+        label.sizeToFit()
+        label.frame.size.height = CommentItemView.Design.height * scale
+        addSubview(label)
+        
+        imageView.image = #imageLiteral(resourceName: "VibbidiIcon")
+        imageView.frame = CGRect(x: label.frame.maxX + 4 * scale, y: 0, width: Design.logoHeight * scale, height: Design.logoHeight * scale)
+        addSubview(imageView)
+        imageView.layer.cornerRadius = 5 * scale
+        imageView.layer.masksToBounds = true
+        
+        frame.size.width = imageView.frame.maxX + 9 * scale
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        label.frame.origin.y = (frame.height - label.frame.height) / 2
+        imageView.frame.origin.y = (frame.height - imageView.frame.height) / 2
     }
 }

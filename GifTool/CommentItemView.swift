@@ -15,8 +15,8 @@ class CommentItemView: UIView {
     
     struct Design {
         static let duration: TimeInterval = 5
-        static let font: UIFont = UIFont.boldSystemFont(ofSize: 20)
-        static let height: CGFloat = 36
+        static let font: UIFont = UIFont.FontHeavyBold(14)
+        static let height: CGFloat = 27
     }
     
     private let scale: CGFloat
@@ -32,6 +32,13 @@ class CommentItemView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        for subview in subviews {
+            subview.frame.origin.y = (frame.height - subview.frame.height) / 2
+        }
     }
     
     private func initView() {

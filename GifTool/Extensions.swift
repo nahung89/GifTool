@@ -30,6 +30,51 @@ extension UILabel {
     }
 }
 
+extension UIFont {
+    
+    class func Font(_ size: CGFloat) -> UIFont! {
+        guard let f = UIFont(name: ".SFUIDisplay-Light", size: size) else {
+            return UIFont.systemFont(ofSize: size, weight: UIFont.Weight.light)
+        }
+        return f
+    }
+    
+    class func FontMedium(_ size: CGFloat) -> UIFont! {
+        guard let f = UIFont(name: ".SFUIDisplay-Medium", size: size) else {
+            return UIFont.systemFont(ofSize: size, weight: UIFont.Weight.medium)
+        }
+        return f
+    }
+    
+    class func FontRegular(_ size: CGFloat) -> UIFont! {
+        guard let f = UIFont(name: ".SFUIDisplay-Regular", size: size) else {
+            return UIFont.systemFont(ofSize: size, weight: UIFont.Weight.regular)
+        }
+        return f
+    }
+    
+    class func FontBold(_ size: CGFloat) -> UIFont! {
+        guard let f = UIFont(name: ".SFUIDisplay-Semibold", size: size) else {
+            return UIFont.systemFont(ofSize: size, weight: UIFont.Weight.semibold)
+        }
+        return f
+    }
+    
+    class func FontHardBold(_ size: CGFloat) -> UIFont! {
+        guard let f = UIFont(name: ".SFUIDisplay-Bold", size: size) else {
+            return UIFont.systemFont(ofSize: size, weight: UIFont.Weight.bold)
+        }
+        return f
+    }
+    
+    class func FontHeavyBold(_ size: CGFloat) -> UIFont! {
+        guard let f = UIFont(name: ".SFUIDisplay-Heavy", size: size) else {
+            return UIFont.systemFont(ofSize: size, weight: UIFont.Weight.heavy)
+        }
+        return f
+    }
+}
+
 extension UIViewController {
     
     func displayError(_ message: String) {

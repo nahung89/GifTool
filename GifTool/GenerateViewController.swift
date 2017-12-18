@@ -227,7 +227,7 @@ private extension GenerateViewController {
         
         let commentView = CommentItemView(scale: 1.0)
         commentView.setCommentParts(commentParts)
-        commentView.frame.origin = CGPoint(x: videoArea.frame.width, y: CGFloat(comment.row) * CommentItemView.Design.height)
+        commentView.frame.origin = CGPoint(x: videoArea.frame.width, y: CGFloat(comment.renderRow) * CommentItemView.Design.height)
         
         videoArea.addSubview(commentView)
         commentView.animate(speed: videoComment.video.commentSpeed, delay: 0)

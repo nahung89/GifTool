@@ -38,7 +38,8 @@ class VideoMerge {
     private var completionBlock: VideoExportCompletionBlock?
     
     private let kDisplayWidth: CGFloat = UIScreen.main.bounds.width
-    private let kExportWidth: CGFloat = 1024
+    private let kExportWidth: CGFloat = ceil(200 / 16) * 16 // round width to multiply of 16
+    private let kNumberOfLines: CGFloat = 6
     
     init(videoUrl: URL, source: VideoComment, cacheDirectoryUrl: URL) {
         self.videoUrl = videoUrl
@@ -274,6 +275,7 @@ private extension VideoMerge {
         
         // let composeHeight = videoFrame.height * kDisplayWidth / videoFrame.width
         let scale: CGFloat = videoFrame.width / kDisplayWidth
+        let lineHeight = videoFrame.height / kNumberOfLines
         
         let texts = source.comments
         
@@ -286,7 +288,8 @@ private extension VideoMerge {
             
             commentView.frame.origin.x = videoFrame.maxX
             // commentView.frame.origin.y = videoFrame.height - videoFrame.height * comment.yPosition / composeHeight - commentView.bounds.height
-            commentView.frame.origin.y = videoFrame.height - CGFloat(comment.row) * CommentItemView.Design.height * scale - commentView.bounds.height
+            commentView.frame.size.height = lineHeight
+            commentView.frame.origin.y = videoFrame.height - CGFloat(comment.renderRow) * lineHeight - commentView.bounds.height
             
             let moveAnimation =  CABasicAnimation(keyPath: "position.x")
             moveAnimation.byValue = -(videoFrame.width + commentView.bounds.width)
@@ -305,6 +308,7 @@ private extension VideoMerge {
         
         let watermark = WatermarkView(scale: scale)
         watermark.frame.origin = CGPoint(x: videoFrame.width - watermark.frame.width, y: 0)
+        watermark.frame.size.height = lineHeight
         overlayLayer.addSublayer(watermark.layer)
         overlayViews.append(watermark) // *Very importance: To store instance, otherwise it can't render
         

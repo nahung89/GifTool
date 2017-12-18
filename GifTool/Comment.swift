@@ -17,6 +17,8 @@ struct Comment {
     let content: String
     let startAt: TimeInterval
     let row: Int
+    
+    let renderRow: Int
 }
 
 extension Comment: Unboxable {
@@ -28,5 +30,7 @@ extension Comment: Unboxable {
         self.content = try u.unbox(key: "Comment")
         self.startAt = try u.unbox(key: "Sec")
         self.row = try u.unbox(key: "Row")
+        
+        self.renderRow = self.row - 1
     }
 }
