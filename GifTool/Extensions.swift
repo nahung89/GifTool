@@ -94,6 +94,15 @@ extension UIViewController {
             alertController.addAction(okAction)
             present(alertController, animated: true, completion: nil)
     }
+    
+    func displayInfo(_ message: String) {
+        let alertController = UIAlertController(title: "Info", message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default) { (action) in
+            // do nothing...
+        }
+        alertController.addAction(okAction)
+        present(alertController, animated: true, completion: nil)
+    }
 }
 
 extension UIView {

@@ -15,8 +15,10 @@ import Alamofire
 import AVKit
 import AssetsLibrary
 import Photos
+import SwiftyJSON
 
-var exportWidth: CGFloat = 600
+let exportWidth: CGFloat = 600
+let smallExportWidth: CGFloat = 300
 
 class GenerateViewController: UIViewController {
     
@@ -26,7 +28,6 @@ class GenerateViewController: UIViewController {
     
     @IBOutlet weak var exportLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
-    @IBOutlet weak var widthButton: UIButton!
     
     private(set) var videoId: String?
     
@@ -34,7 +35,10 @@ class GenerateViewController: UIViewController {
     private var commentsQueue: [Comment] = []
     
     private var videoMerge: VideoMerge?
-    private var request: Alamofire.DownloadRequest?
+    private var smallVideoMerge: VideoMerge?
+    
+    private var downloadRequest: Alamofire.DownloadRequest?
+    private var uploadRequest: Alamofire.UploadRequest?
     
     private let exportProgress: Variable<Float> = Variable(0)
     
@@ -46,11 +50,12 @@ class GenerateViewController: UIViewController {
         if let id = videoId {
             request(id: id)
         }
-        widthButton.setTitle("Video Width: ~\(exportWidth)pt", for: .normal)
     }
     
     deinit {
         playerView.clear()
+        downloadRequest?.cancel()
+        uploadRequest?.cancel()
     }
     
     func set(video: Video) {
@@ -70,16 +75,16 @@ class GenerateViewController: UIViewController {
         }
         
         if  let videoUrl = URL(string: videoComment.video.videoPath),
-            let exportDirectoryUrl = createExportDirectory() {
-            let exportUrl = exportDirectoryUrl.appendingPathComponent(videoUrl.lastPathComponent)
-            if FileManager.default.fileExists(atPath: exportUrl.path) {
-                playExportedVideo(exportUrl)
-                return
-            }
+            let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            FileManager.default.fileExists(atPath: exportUrl.path),
+            FileManager.default.fileExists(atPath: smallExportUrl.path) {
+            playExportedVideo(exportUrl)
+            return
         }
         
         if let downloadedUrl = download(videoPath: videoComment.video.videoPath) {
-            playDownloadVideo(downloadedUrl)
+            process(downloadedUrl)
             return
         }
     }
@@ -97,7 +102,6 @@ class GenerateViewController: UIViewController {
         }
         
         if FileManager.default.fileExists(atPath: saveUrl.path) {
-            process(saveUrl)
             return saveUrl
         }
         
@@ -111,40 +115,59 @@ class GenerateViewController: UIViewController {
             return
         }
         
-        guard let exportDirectoryUrl = createExportDirectory() else {
+        guard
+            let exportUrl = createExportDirectory()?.appendingPathComponent(cacheVideoUrl.lastPathComponent)
+            else {
             exportLabel.text = "Error. Can't find export directory"
             return
         }
         
-        guard exportWidth >= 200 && exportWidth <= 2000 else  {
-            exportLabel.text = "Error. Export width need to be in range 200pt to 2000pt"
-            return
-        }
         
         videoMerge = VideoMerge(videoUrl: cacheVideoUrl,
                                 source: videoComment,
-                                cacheDirectoryUrl: exportDirectoryUrl,
+                                exportUrl: exportUrl,
                                 exportWidth: exportWidth)
         
-        let begin = Date()
         videoMerge?.startExportVideo(onProgress: { [weak self] (progress) in
-            self?.exportLabel.text = "Exporting: \(progress)"
-            self?.progressView.progress = Float(progress)
+            guard let `self` = self else { return }
+            self.exportLabel.text = "Exporting Big: \(progress)"
+            self.progressView.progress = Float(progress)
             }, onCompletion: { [weak self] (videoData, thumbData, error) in
-                let totalTime = Date().timeIntervalSince(begin)
-                self?.exportLabel.text = """
-                Total time: \(totalTime)
-                ---------
-                render: \((self?.videoMerge?.exportSize).logable)pt
-                video: \((videoData?.sizeString(units: [.useMB], countStyle: .file)).logable)
-                thumb: \((thumbData?.sizeString(units: [.useMB], countStyle: .file)).logable)
-                export: \((self?.videoMerge?.exportedUrl).logable)
-                error: \(error.logable)
-                """
-                
-                if error == nil, let url = self?.videoMerge?.exportedUrl {
-                    self?.saveToCamera(url)
-                    self?.playExportedVideo(url)
+                guard let `self` = self else { return }
+                if case .some(.finished(_)) = self.videoMerge?.state {
+                    self.processSmall(cacheVideoUrl)
+                }
+        })
+    }
+    
+    func processSmall(_ cacheVideoUrl: URL) {
+        guard let videoComment = videoComment else {
+            exportLabel.text = "Error. Data empty"
+            return
+        }
+        
+        guard let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(cacheVideoUrl.lastPathComponent)
+            else {
+                exportLabel.text = "Error. Can't find export directory"
+                return
+        }
+        
+        smallVideoMerge = VideoMerge(videoUrl: cacheVideoUrl,
+                                     source: videoComment,
+                                     exportUrl: smallExportUrl,
+                                     exportWidth: smallExportWidth)
+        
+        smallVideoMerge?.startExportVideo(onProgress: { [weak self] (progress) in
+            guard let `self` = self else { return }
+            self.exportLabel.text = "Exporting Small: \(progress)"
+            self.progressView.progress = Float(progress)
+            }, onCompletion: { [weak self] (videoData, thumbData, error) in
+                guard let `self` = self else { return }
+                if case let .some(.finished(url)) = self.videoMerge?.state,
+                    case let .some(.finished(smallUrl)) = self.smallVideoMerge?.state,
+                    let videoId = self.videoId {
+                    self.playExportedVideo(url)
+                    self.upload(videoId: videoId, exportUrl: url, smallExportUrl: smallUrl)
                 }
         })
     }
@@ -164,44 +187,39 @@ extension GenerateViewController {
         }
         
         if  let videoUrl = URL(string: videoComment.video.videoPath),
-            let exportDirectoryUrl = createExportDirectory() {
-            let exportUrl = exportDirectoryUrl.appendingPathComponent(videoUrl.lastPathComponent)
+            let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent) {
             try? FileManager.default.removeItem(at: exportUrl)
+        }
+        if  let videoUrl = URL(string: videoComment.video.videoPath),
+            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent) {
+            try? FileManager.default.removeItem(at: smallExportUrl)
         }
         
         playerView.suspend()
         videoArea.removeAllSubview()
         playerDisposeBag = DisposeBag()
-        _ = download(videoPath: videoComment.video.videoPath)
+        
+        request(id: videoComment.video.id)
     }
     
-    @IBAction func changeWidth() {
-        let alertController = UIAlertController(title: "", message: "", preferredStyle: .alert)
-        alertController.addTextField(configurationHandler: {(_ textField: UITextField) -> Void in
-            textField.placeholder = "\(exportWidth)"
-            textField.keyboardType = .numberPad
-        })
-        let confirmAction = UIAlertAction(title: "OK", style: .default, handler: {(_ action: UIAlertAction) -> Void in
-            guard let text = alertController.textFields?[0].text, let number = Float(text) else { return }
-            exportWidth = CGFloat(number)
-            self.widthButton.setTitle("Video Width: ~\(text)pt", for: .normal)
-            self.reset()
-        })
-        alertController.addAction(confirmAction)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {(_ action: UIAlertAction) -> Void in
-        })
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true)
-    }
-    
-    func saveToCamera(_ exportedUrl: URL) {
-        let isVideoCompatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(exportedUrl.path)
-        log.info("VideoCompatible: \(isVideoCompatible)")
+    @IBAction func saveToCamera() {
+        guard
+            let videoPath = videoComment?.video.videoPath,
+            let videoUrl = URL(string: videoPath),
+            let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            FileManager.default.fileExists(atPath: exportUrl.path),
+            FileManager.default.fileExists(atPath: smallExportUrl.path)
+            else {
+                exportLabel.text = "Error. Doesn't have exported files."
+                return
+        }
         
         PHPhotoLibrary.shared().performChanges({
-            _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportedUrl)
+            _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportUrl)
+            _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
         }, completionHandler: { (success, error) in
-            log.info("Save Camera Roll: \(success) - error")
+            self.exportLabel.text = "Saved To Camera Roll!"
         })
     }
 }
@@ -269,6 +287,7 @@ private extension GenerateViewController {
         commentView.animate(speed: videoComment.video.commentSpeed, delay: 0)
     }
 }
+
 extension GenerateViewController {
     
     func request(id: String) {
@@ -302,7 +321,9 @@ extension GenerateViewController {
             return (saveURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         
-        request = Alamofire.download(loadURL, to: destination)
+        downloadRequest?.cancel()
+        
+        downloadRequest = Alamofire.download(loadURL, to: destination)
             .downloadProgress{ progress in
                 DispatchQueue.main.async {
                     self.exportLabel.text = "Downloading video: \(progress.fractionCompleted)..."
@@ -323,7 +344,38 @@ extension GenerateViewController {
                 }
         }
         
-        request?.resume()
+        downloadRequest?.resume()
+    }
+    
+    func upload(videoId: String, exportUrl: URL, smallExportUrl: URL) {
+        let uploadUrl = "https://api4.vibbidi.com/v5.0/admin/sgifs"
+        uploadRequest?.cancel()
+        
+        Alamofire.upload(
+            multipartFormData: { multipartFormData in
+                multipartFormData.append(exportUrl, withName: "file")
+                multipartFormData.append(smallExportUrl, withName: "preview")
+                multipartFormData.append(videoId.data(using: String.Encoding.utf8)!, withName: "id")
+        },
+            to: uploadUrl,
+            encodingCompletion: { [weak self] encodingResult in
+                guard let `self` = self else { return }
+                switch encodingResult {
+                case .success(let upload, _, _):
+                    self.uploadRequest = upload
+                    upload.uploadProgress(queue: DispatchQueue.main, closure: { [weak self] (progress) in
+                        self?.exportLabel.text = "Uploading video: \(progress.fractionCompleted)..."
+                        self?.progressView.progress = Float(progress.fractionCompleted)
+                    })
+                    
+                    upload.responseJSON { [weak self] response in
+                        self?.exportLabel.text = response.description
+                    }
+                case .failure(let encodingError):
+                    self.exportLabel.text = "Error. Uploading video: \(encodingError)..."
+                    log.error(encodingError)
+                }
+        })
     }
 }
 
@@ -354,6 +406,25 @@ private extension GenerateViewController {
         }
         
         let url = documentDirectoryUrl.appendingPathComponent("Export", isDirectory: true)
+        
+        if !FileManager.default.fileExists(atPath: url.path) {
+            do {
+                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.setAttributes([FileAttributeKey.protectionKey: FileProtectionType.none], ofItemAtPath: url.path)
+            } catch {
+                log.error("Error: \(error)")
+                return nil
+            }
+        }
+        return url
+    }
+    
+    func createSmallExportDirectory() -> URL? {
+        guard let documentDirectoryUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        
+        let url = documentDirectoryUrl.appendingPathComponent("Export_Small", isDirectory: true)
         
         if !FileManager.default.fileExists(atPath: url.path) {
             do {

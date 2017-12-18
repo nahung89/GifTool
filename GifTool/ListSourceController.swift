@@ -55,6 +55,11 @@ class ListSourceController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        request()
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard
             segue.identifier == "generate",
@@ -83,7 +88,15 @@ extension ListSourceController {
             .observeOn(RxScheduler.shared.main)
             .subscribe(onNext: { [unowned self] (r: [Video]) in
                 self.videos = r
-                self.filterVideos = self.videos
+                
+                if let text = self.searchBar.text, !text.isEmpty {
+                    self.filterVideos = self.videos.filter({ $0.title.contains(text) ||
+                        $0.id.contains(text) ||
+                        $0.artist.contains(text)
+                    })
+                } else {
+                    self.filterVideos = self.videos
+                }
                 self.tableView.reloadData()
                 }, onError: { [unowned self] (error) in
                     self.displayError(error.localizedDescription)

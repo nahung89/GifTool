@@ -23,15 +23,14 @@ class VideoMerge {
         case none, merging, finished(URL), failed(Error?)
     }
     
-    private(set) var exportedUrl: URL?
-    private var state: State = .none
+    private(set) var state: State = .none
     
     private var videoUrl: URL
     private var source: VideoComment
     private let kExportWidth: CGFloat // round width to multiply of 16
     private var overlayViews: [UIView] = []
     
-    private var cacheDirectoryUrl: URL
+    private var exportUrl: URL
     private var exportSession: AVAssetExportSession?
     
     private var progressBlock: VideoExportProgressBlock?
@@ -45,10 +44,10 @@ class VideoMerge {
         return exportSession?.videoComposition?.renderSize
     }
     
-    init(videoUrl: URL, source: VideoComment, cacheDirectoryUrl: URL, exportWidth: CGFloat = 600) {
+    init(videoUrl: URL, source: VideoComment, exportUrl: URL, exportWidth: CGFloat = 600) {
         self.videoUrl = videoUrl
         self.source = source
-        self.cacheDirectoryUrl = cacheDirectoryUrl
+        self.exportUrl = exportUrl
         self.kExportWidth = exportWidth
     }
     
@@ -101,7 +100,6 @@ extension VideoMerge {
                     switch export.status {
                     case .completed, .unknown:
                         if let url = export.outputURL, FileManager.default.fileExists(atPath: url.path) {
-                            self.exportedUrl = url
                             self.state = .finished(url)
                             self.finishExport(url, error: nil)
                         } else {
@@ -199,9 +197,11 @@ private extension VideoMerge {
             throw ExportError.noSession
         }
         
+        try? FileManager.default.removeItem(at: exportUrl)
+        
         exportSession.videoComposition = outputComposition
         exportSession.outputFileType = AVFileType.mp4
-        exportSession.outputURL = createExportFileURL()
+        exportSession.outputURL = exportUrl
         exportSession.shouldOptimizeForNetworkUse = true
         return exportSession
     }
@@ -337,18 +337,6 @@ private extension VideoMerge {
 }
 
 private extension VideoMerge {
-    
-    func createExportFileURL() -> URL {
-        if !FileManager.default.fileExists(atPath: cacheDirectoryUrl.path) {
-                try? FileManager.default.createDirectory(at: cacheDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
-                try? FileManager.default.setAttributes([FileAttributeKey.protectionKey: FileProtectionType.none], ofItemAtPath: cacheDirectoryUrl.path)
-        }
-        
-        let fileUrl = cacheDirectoryUrl.appendingPathComponent(videoUrl.lastPathComponent)
-        try? FileManager.default.removeItem(at: fileUrl)
-        
-        return fileUrl
-    }
     
     func createPreviewDataFrom(videoUrl: URL) throws -> Data? {
         let asset = AVAsset(url: videoUrl)

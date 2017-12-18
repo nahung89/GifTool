@@ -41,13 +41,13 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="sZW-RX-Z6N"/>
                                                     </constraints>
-                                                    <state key="normal" title="Complete">
+                                                    <state key="normal" title="Completed">
                                                         <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JkH-Gn-Ven">
                                                     <rect key="frame" x="195" y="111" width="165" height="30"/>
-                                                    <state key="normal" title="Compile">
+                                                    <state key="normal" title="Compiled">
                                                         <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                 </button>
@@ -181,9 +181,9 @@
                                     <constraint firstAttribute="width" constant="200" id="0x0-Ig-cUE"/>
                                     <constraint firstAttribute="height" constant="30" id="ZSf-BC-tob"/>
                                 </constraints>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="Save CameraRoll"/>
                                 <connections>
-                                    <action selector="changeWidth" destination="ABM-mw-8yg" eventType="touchUpInside" id="8bM-Kf-ZZG"/>
+                                    <action selector="saveToCamera" destination="ABM-mw-8yg" eventType="touchUpInside" id="98w-Qg-lte"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -212,7 +212,6 @@
                         <outlet property="progressView" destination="TMn-Pc-gOV" id="YaG-E2-2rx"/>
                         <outlet property="videoArea" destination="xgB-7M-4ON" id="21b-VX-Tx1"/>
                         <outlet property="videoHeightConstraint" destination="wYx-PA-OBy" id="1Gu-1n-q47"/>
-                        <outlet property="widthButton" destination="idJ-rI-xdY" id="s0t-Ah-abY"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mML-rX-jBj" sceneMemberID="firstResponder"/>
