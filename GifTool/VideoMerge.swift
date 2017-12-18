@@ -28,7 +28,7 @@ class VideoMerge {
     
     private var videoUrl: URL
     private var source: VideoComment
-    private var brushImage: UIImage?
+    private let kExportWidth: CGFloat // round width to multiply of 16
     private var overlayViews: [UIView] = []
     
     private var cacheDirectoryUrl: URL
@@ -38,13 +38,18 @@ class VideoMerge {
     private var completionBlock: VideoExportCompletionBlock?
     
     private let kDisplayWidth: CGFloat = UIScreen.main.bounds.width
-    private let kExportWidth: CGFloat = ceil(200 / 16) * 16 // round width to multiply of 16
+    // private let kExportWidth: CGFloat = 600
     private let kNumberOfLines: CGFloat = 6
     
-    init(videoUrl: URL, source: VideoComment, cacheDirectoryUrl: URL) {
+    var exportSize: CGSize? {
+        return exportSession?.videoComposition?.renderSize
+    }
+    
+    init(videoUrl: URL, source: VideoComment, cacheDirectoryUrl: URL, exportWidth: CGFloat = 600) {
         self.videoUrl = videoUrl
         self.source = source
         self.cacheDirectoryUrl = cacheDirectoryUrl
+        self.kExportWidth = exportWidth
     }
     
     deinit {
@@ -177,7 +182,8 @@ private extension VideoMerge {
         
         let naturalSize = videoCompositionTrack.naturalSize
         let scale: CGFloat = kExportWidth / naturalSize.width
-        let exportSize = CGSize(width: naturalSize.width * scale, height: naturalSize.height * scale)
+        let exportSize = CGSize(width: ceil(naturalSize.width * scale / 16) * 16,
+                                height:ceil(naturalSize.height * scale / 16) * 16)
         
         // Output video composition
         let outputComposition = AVMutableVideoComposition()

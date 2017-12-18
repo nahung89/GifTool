@@ -16,6 +16,8 @@ import AVKit
 import AssetsLibrary
 import Photos
 
+var exportWidth: CGFloat = 600
+
 class GenerateViewController: UIViewController {
     
     private let playerView = VideoPlayerView()
@@ -24,6 +26,7 @@ class GenerateViewController: UIViewController {
     
     @IBOutlet weak var exportLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var widthButton: UIButton!
     
     private(set) var videoId: String?
     
@@ -43,6 +46,11 @@ class GenerateViewController: UIViewController {
         if let id = videoId {
             request(id: id)
         }
+        widthButton.setTitle("Video Width: ~\(exportWidth)pt", for: .normal)
+    }
+    
+    deinit {
+        playerView.clear()
     }
     
     func set(video: Video) {
@@ -108,7 +116,15 @@ class GenerateViewController: UIViewController {
             return
         }
         
-        videoMerge = VideoMerge(videoUrl: cacheVideoUrl, source: videoComment, cacheDirectoryUrl: exportDirectoryUrl)
+        guard exportWidth >= 200 && exportWidth <= 2000 else  {
+            exportLabel.text = "Error. Export width need to be in range 200pt to 2000pt"
+            return
+        }
+        
+        videoMerge = VideoMerge(videoUrl: cacheVideoUrl,
+                                source: videoComment,
+                                cacheDirectoryUrl: exportDirectoryUrl,
+                                exportWidth: exportWidth)
         
         let begin = Date()
         videoMerge?.startExportVideo(onProgress: { [weak self] (progress) in
@@ -119,8 +135,9 @@ class GenerateViewController: UIViewController {
                 self?.exportLabel.text = """
                 Total time: \(totalTime)
                 ---------
-                video: \((videoData?.description).logable)
-                thumb: \((thumbData?.description).logable)
+                render: \((self?.videoMerge?.exportSize).logable)pt
+                video: \((videoData?.sizeString(units: [.useMB], countStyle: .file)).logable)
+                thumb: \((thumbData?.sizeString(units: [.useMB], countStyle: .file)).logable)
                 export: \((self?.videoMerge?.exportedUrl).logable)
                 error: \(error.logable)
                 """
@@ -156,6 +173,25 @@ extension GenerateViewController {
         videoArea.removeAllSubview()
         playerDisposeBag = DisposeBag()
         _ = download(videoPath: videoComment.video.videoPath)
+    }
+    
+    @IBAction func changeWidth() {
+        let alertController = UIAlertController(title: "", message: "", preferredStyle: .alert)
+        alertController.addTextField(configurationHandler: {(_ textField: UITextField) -> Void in
+            textField.placeholder = "\(exportWidth)"
+            textField.keyboardType = .numberPad
+        })
+        let confirmAction = UIAlertAction(title: "OK", style: .default, handler: {(_ action: UIAlertAction) -> Void in
+            guard let text = alertController.textFields?[0].text, let number = Float(text) else { return }
+            exportWidth = CGFloat(number)
+            self.widthButton.setTitle("Video Width: ~\(text)pt", for: .normal)
+            self.reset()
+        })
+        alertController.addAction(confirmAction)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {(_ action: UIAlertAction) -> Void in
+        })
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
     }
     
     func saveToCamera(_ exportedUrl: URL) {

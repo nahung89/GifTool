@@ -21,6 +21,15 @@ extension Optional {
     }
 }
 
+extension Data {
+    func sizeString(units: ByteCountFormatter.Units = [.useAll], countStyle: ByteCountFormatter.CountStyle = .file) -> String {
+        let bcf = ByteCountFormatter()
+        bcf.allowedUnits = units
+        bcf.countStyle = .file
+        
+        return bcf.string(fromByteCount: Int64(count))
+    }}
+
 extension UILabel {
     
     func set(font: UIFont, color: UIColor, text: String) {
