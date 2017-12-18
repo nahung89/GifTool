@@ -19,6 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
+        UIApplication.shared.isIdleTimerDisabled = true
+        
         // ImageCache.default.clearDiskCache()
         ImageCache.default.maxMemoryCost = 1
         ImageDownloader.default.downloadTimeout = 30.0

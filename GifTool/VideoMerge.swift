@@ -262,7 +262,12 @@ private extension VideoMerge {
     private func createVideoLayerInstruction(asset: AVAsset, videoCompositionTrack: AVCompositionTrack) -> AVMutableVideoCompositionLayerInstruction {
         let totalVideoTime = CMTimeAdd(kCMTimeZero, asset.duration)
         let naturalSize = videoCompositionTrack.naturalSize
-        let scale: CGFloat = kExportWidth / naturalSize.width
+        
+        let tmpScale: CGFloat = kExportWidth / naturalSize.width
+        let exportSize = CGSize(width: ceil(naturalSize.width * tmpScale / 16) * 16,
+                                height:ceil(naturalSize.height * tmpScale / 16) * 16)
+        
+        let scale = max(exportSize.width / naturalSize.width, exportSize.height / naturalSize.height)
         let transform = videoCompositionTrack.preferredTransform.scaledBy(x: scale, y: scale)
         
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoCompositionTrack)

@@ -15,8 +15,8 @@ class WatermarkView: UIView {
     let imageView = UIImageView()
     
     struct Design {
-        static let font: UIFont = UIFont.FontMedium(8)
-        static let logoHeight: CGFloat = 16
+        static let font: UIFont = UIFont.FontHardBold(11)
+        static let logoHeight: CGFloat = 24
     }
     
     private let scale: CGFloat
@@ -48,12 +48,12 @@ class WatermarkView: UIView {
         addSubview(label)
         
         imageView.image = #imageLiteral(resourceName: "VibbidiIcon")
-        imageView.frame = CGRect(x: label.frame.maxX + 4 * scale, y: 0, width: Design.logoHeight * scale, height: Design.logoHeight * scale)
+        imageView.frame = CGRect(x: label.frame.maxX + 8 * scale, y: 0, width: Design.logoHeight * scale, height: Design.logoHeight * scale)
         addSubview(imageView)
         imageView.layer.cornerRadius = 5 * scale
         imageView.layer.masksToBounds = true
         
-        frame.size.width = imageView.frame.maxX + 9 * scale
+        frame.size.width = imageView.frame.maxX + 8 * scale
     }
     
     override func layoutSubviews() {
