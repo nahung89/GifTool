@@ -53,11 +53,27 @@ class ListSourceController: UIViewController {
                 self.tableView.reloadData()
             })
             .disposed(by: disposeBag)
+        
+        AppDelegate.shared().finishComplileVideo.subscribe(onNext: { (videoId) in
+            guard let index = self.videos.index(where: { $0.id == videoId }) else { return }
+            self.videos[index].isComplied = true
+            if let text = self.searchBar.text, !text.isEmpty {
+                self.filterVideos = self.videos.filter({ $0.title.contains(text) ||
+                    $0.id.contains(text) ||
+                    $0.artist.contains(text)
+                })
+            } else {
+                self.filterVideos = self.videos
+            }
+            self.tableView.reloadData()
+        }).disposed(by: disposeBag)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        request()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if AppDelegate.shared().autoRun {
+            autoRun()
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -75,6 +91,12 @@ extension ListSourceController {
     @IBAction func refresh() {
         request()
         preloadGifs()
+    }
+    
+    @IBAction func autoRun() {
+        AppDelegate.shared().autoRun = true
+        guard let video = self.videos.filter({ $0.isComplied != true }).first else { return }
+        self.performSegue(withIdentifier: "generate", sender: video)
     }
 }
 

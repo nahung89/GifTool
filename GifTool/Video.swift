@@ -34,7 +34,7 @@ struct Video {
     let size: CGSize
     let duration: TimeInterval
     
-    let isComplied: Bool?
+    var isComplied: Bool?
     let isCompleted: Bool
     
     let commentSpeed: TimeInterval

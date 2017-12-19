@@ -31,6 +31,7 @@ class GenerateViewController: UIViewController {
     @IBOutlet weak var widthButton: UIButton!
     @IBOutlet weak var saveButton: UIButton!
     @IBOutlet weak var uploadButton: UIButton!
+    @IBOutlet weak var autoRunButton: UIButton!
     
     private(set) var videoId: String?
     
@@ -56,6 +57,8 @@ class GenerateViewController: UIViewController {
         
         widthButton.setTitle("Video Width: ~\(exportWidth)pt", for: .normal)
         widthButton.isHidden = true
+        
+        autoRunButton.setTitle(AppDelegate.shared().autoRun ? "Auto Compile: Running" : "Auto Compile: Stopped", for: .normal)
     }
     
     deinit {
@@ -264,6 +267,11 @@ extension GenerateViewController {
         
         upload(videoId: videoComment.video.id, exportUrl: exportUrl, smallExportUrl: smallExportUrl)
     }
+    
+    @IBAction func toggleAutoRun() {
+        AppDelegate.shared().autoRun = !AppDelegate.shared().autoRun
+        autoRunButton.setTitle(AppDelegate.shared().autoRun ? "Auto Compile: Running" : "Auto Compile: Stopped", for: .normal)
+    }
 }
 
 private extension GenerateViewController {
@@ -413,6 +421,10 @@ extension GenerateViewController {
                     
                     upload.responseJSON { [weak self] response in
                         self?.exportLabel.text = response.description
+                        AppDelegate.shared().finishComplileVideo.onNext(videoId)
+                        if AppDelegate.shared().autoRun {
+                            self?.navigationController?.popViewController(animated: true)
+                        }
                     }
                 case .failure(let encodingError):
                     self.exportLabel.text = "Error. Uploading video: \(encodingError)..."
