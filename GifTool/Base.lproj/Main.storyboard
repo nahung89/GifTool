@@ -192,13 +192,27 @@
                                     <action selector="saveToCamera" destination="ABM-mw-8yg" eventType="touchUpInside" id="98w-Qg-lte"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q0j-xa-qfc">
+                                <rect key="frame" x="87" y="521" width="200" height="30"/>
+                                <color key="backgroundColor" red="1" green="0.95730383417970022" blue="0.11493582823331716" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="W9Z-jQ-IgK"/>
+                                    <constraint firstAttribute="width" constant="200" id="dhn-yt-WEW"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="changeWidth" destination="ABM-mw-8yg" eventType="touchUpInside" id="C41-7x-JLs"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="0.65577902931348275" blue="0.83827001027330672" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="xgB-7M-4ON" firstAttribute="trailing" secondItem="Pej-OJ-5kp" secondAttribute="trailing" id="1yz-Eu-q4r"/>
                             <constraint firstItem="Pej-OJ-5kp" firstAttribute="bottom" secondItem="B6w-qa-mma" secondAttribute="bottom" id="3vj-FZ-kzS"/>
                             <constraint firstItem="B6w-qa-mma" firstAttribute="leading" secondItem="Pej-OJ-5kp" secondAttribute="leading" id="PCU-yt-d1y"/>
+                            <constraint firstItem="q0j-xa-qfc" firstAttribute="centerX" secondItem="bbx-v7-WNW" secondAttribute="centerX" id="UuW-VV-3Yi"/>
                             <constraint firstItem="idJ-rI-xdY" firstAttribute="top" secondItem="xgB-7M-4ON" secondAttribute="bottom" constant="22" id="bLF-6V-zTT"/>
+                            <constraint firstItem="q0j-xa-qfc" firstAttribute="top" secondItem="idJ-rI-xdY" secondAttribute="bottom" constant="30" id="heD-ip-1J1"/>
                             <constraint firstItem="idJ-rI-xdY" firstAttribute="centerX" secondItem="bbx-v7-WNW" secondAttribute="centerX" id="jG6-ws-rlc"/>
                             <constraint firstAttribute="trailing" secondItem="B6w-qa-mma" secondAttribute="trailing" id="mL8-hp-We9"/>
                             <constraint firstItem="xgB-7M-4ON" firstAttribute="top" secondItem="Pej-OJ-5kp" secondAttribute="top" id="puZ-0d-Se3"/>
@@ -219,6 +233,7 @@
                         <outlet property="saveButton" destination="idJ-rI-xdY" id="048-su-7Yb"/>
                         <outlet property="videoArea" destination="xgB-7M-4ON" id="21b-VX-Tx1"/>
                         <outlet property="videoHeightConstraint" destination="wYx-PA-OBy" id="1Gu-1n-q47"/>
+                        <outlet property="widthButton" destination="q0j-xa-qfc" id="4Ah-c3-VHh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mML-rX-jBj" sceneMemberID="firstResponder"/>
