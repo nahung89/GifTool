@@ -24,6 +24,9 @@
 		110F6D251FE290B5004FA302 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 110F6D0F1FE290B5004FA302 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		110F6D271FE290B5004FA302 /* Unbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 110F6D101FE290B5004FA302 /* Unbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		110F6D291FE290B5004FA302 /* RxBlocking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 110F6D111FE290B5004FA302 /* RxBlocking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		114E65311FE8AAD0008F24FC /* getList.json in Resources */ = {isa = PBXBuildFile; fileRef = 114E65301FE8AAD0008F24FC /* getList.json */; };
+		114E65331FE8AB37008F24FC /* emojis.json in Resources */ = {isa = PBXBuildFile; fileRef = 114E65321FE8AB37008F24FC /* emojis.json */; };
+		114E65351FE8AB77008F24FC /* getItem.json in Resources */ = {isa = PBXBuildFile; fileRef = 114E65341FE8AB77008F24FC /* getItem.json */; };
 		11C37DF41FE3510C00DC263D /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C37DF31FE3510C00DC263D /* Const.swift */; };
 		11C37DF61FE3515800DC263D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C37DF51FE3515800DC263D /* Extensions.swift */; };
 		11C37DF91FE351F100DC263D /* RxAlamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11C37DF71FE351F000DC263D /* RxAlamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -48,7 +51,6 @@
 		11E2577B1FE3C91300601A1F /* PreviewSourceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2577A1FE3C91300601A1F /* PreviewSourceCell.swift */; };
 		11E2577D1FE4202C00601A1F /* VideoMerge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2577C1FE4202C00601A1F /* VideoMerge.swift */; };
 		11E2577F1FE424A100601A1F /* WatermarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2577E1FE424A100601A1F /* WatermarkView.swift */; };
-		11E257811FE4258B00601A1F /* test_video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 11E257801FE4258B00601A1F /* test_video.mp4 */; };
 		11E257831FE4D0DB00601A1F /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E257821FE4D0DB00601A1F /* VideoPlayerView.swift */; };
 		11E257851FE4D1A100601A1F /* VideoPlayerLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E257841FE4D1A100601A1F /* VideoPlayerLayerView.swift */; };
 		11E257871FE4D27800601A1F /* RxSwift+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E257861FE4D27800601A1F /* RxSwift+Extensions.swift */; };
@@ -100,6 +102,9 @@
 		110F6D0F1FE290B5004FA302 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		110F6D101FE290B5004FA302 /* Unbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Unbox.framework; path = Carthage/Build/iOS/Unbox.framework; sourceTree = "<group>"; };
 		110F6D111FE290B5004FA302 /* RxBlocking.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxBlocking.framework; path = Carthage/Build/iOS/RxBlocking.framework; sourceTree = "<group>"; };
+		114E65301FE8AAD0008F24FC /* getList.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = getList.json; sourceTree = "<group>"; };
+		114E65321FE8AB37008F24FC /* emojis.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = emojis.json; sourceTree = "<group>"; };
+		114E65341FE8AB77008F24FC /* getItem.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = getItem.json; sourceTree = "<group>"; };
 		11C37DF31FE3510C00DC263D /* Const.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		11C37DF51FE3515800DC263D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		11C37DF71FE351F000DC263D /* RxAlamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxAlamofire.framework; path = Carthage/Build/iOS/RxAlamofire.framework; sourceTree = "<group>"; };
@@ -113,7 +118,6 @@
 		11E2577A1FE3C91300601A1F /* PreviewSourceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSourceCell.swift; sourceTree = "<group>"; };
 		11E2577C1FE4202C00601A1F /* VideoMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoMerge.swift; sourceTree = "<group>"; };
 		11E2577E1FE424A100601A1F /* WatermarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatermarkView.swift; sourceTree = "<group>"; };
-		11E257801FE4258B00601A1F /* test_video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = test_video.mp4; sourceTree = "<group>"; };
 		11E257821FE4D0DB00601A1F /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
 		11E257841FE4D1A100601A1F /* VideoPlayerLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerLayerView.swift; sourceTree = "<group>"; };
 		11E257861FE4D27800601A1F /* RxSwift+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RxSwift+Extensions.swift"; sourceTree = "<group>"; };
@@ -172,7 +176,7 @@
 				110F6CF81FE28427004FA302 /* Assets.xcassets */,
 				110F6CFA1FE28427004FA302 /* LaunchScreen.storyboard */,
 				110F6CFD1FE28427004FA302 /* Info.plist */,
-				11E257801FE4258B00601A1F /* test_video.mp4 */,
+				114E652F1FE8A9A3008F24FC /* json */,
 			);
 			path = GifTool;
 			sourceTree = "<group>";
@@ -195,6 +199,16 @@
 				110F6D0E1FE290B4004FA302 /* XCGLogger.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		114E652F1FE8A9A3008F24FC /* json */ = {
+			isa = PBXGroup;
+			children = (
+				114E65301FE8AAD0008F24FC /* getList.json */,
+				114E65321FE8AB37008F24FC /* emojis.json */,
+				114E65341FE8AB77008F24FC /* getItem.json */,
+			);
+			name = json;
 			sourceTree = "<group>";
 		};
 		11C37DF21FE350FE00DC263D /* Ultilities */ = {
@@ -303,9 +317,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				110F6CFC1FE28427004FA302 /* LaunchScreen.storyboard in Resources */,
+				114E65311FE8AAD0008F24FC /* getList.json in Resources */,
 				110F6CF91FE28427004FA302 /* Assets.xcassets in Resources */,
+				114E65331FE8AB37008F24FC /* emojis.json in Resources */,
+				114E65351FE8AB77008F24FC /* getItem.json in Resources */,
 				110F6CF71FE28427004FA302 /* Main.storyboard in Resources */,
-				11E257811FE4258B00601A1F /* test_video.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
