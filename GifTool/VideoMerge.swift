@@ -44,7 +44,7 @@ class VideoMerge {
         return exportSession?.videoComposition?.renderSize
     }
     
-    init(videoUrl: URL, source: VideoComment, exportUrl: URL, exportWidth: CGFloat = 600) {
+    init(videoUrl: URL, source: VideoComment, exportUrl: URL, exportWidth: CGFloat) {
         self.videoUrl = videoUrl
         self.source = source
         self.exportUrl = exportUrl
@@ -186,7 +186,7 @@ private extension VideoMerge {
         // Output video composition
         let outputComposition = AVMutableVideoComposition()
         outputComposition.instructions = [outputCompositionInstruction]
-        outputComposition.frameDuration = CMTimeMake(1, asset.duration.timescale)
+        outputComposition.frameDuration = CMTimeMake(1, Int32(videoCompositionTrack.nominalFrameRate))
         outputComposition.renderSize = exportSize
         
         // Add effects

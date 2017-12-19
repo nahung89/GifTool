@@ -17,8 +17,8 @@ import AssetsLibrary
 import Photos
 import SwiftyJSON
 
-var exportWidth: CGFloat = 600
-let smallExportWidth: CGFloat = 300
+let exportWidth: CGFloat = 1024
+let smallExportWidth: CGFloat = 512
 
 class GenerateViewController: UIViewController {
     
@@ -30,6 +30,7 @@ class GenerateViewController: UIViewController {
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var widthButton: UIButton!
     @IBOutlet weak var saveButton: UIButton!
+    @IBOutlet weak var uploadButton: UIButton!
     
     private(set) var videoId: String?
     
@@ -52,7 +53,9 @@ class GenerateViewController: UIViewController {
         if let id = videoId {
             request(id: id)
         }
+        
         widthButton.setTitle("Video Width: ~\(exportWidth)pt", for: .normal)
+        widthButton.isHidden = true
     }
     
     deinit {
@@ -79,10 +82,9 @@ class GenerateViewController: UIViewController {
         
         if  let videoUrl = URL(string: videoComment.video.videoPath),
             let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            // let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            FileManager.default.fileExists(atPath: exportUrl.path)
-            // FileManager.default.fileExists(atPath: smallExportUrl.path)
-            {
+            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            FileManager.default.fileExists(atPath: exportUrl.path),
+            FileManager.default.fileExists(atPath: smallExportUrl.path) {
             playExportedVideo(exportUrl)
             return
         }
@@ -139,8 +141,8 @@ class GenerateViewController: UIViewController {
             }, onCompletion: { [weak self] (videoData, thumbData, error) in
                 guard let `self` = self else { return }
                 if case let .some(.finished(url)) = self.videoMerge?.state {
-                    self.playExportedVideo(url)
-                    // self.processSmall(cacheVideoUrl)
+                    log.info("Exported Big: \(url)")
+                    self.processSmall(cacheVideoUrl)
                 }
         })
     }
@@ -212,9 +214,9 @@ extension GenerateViewController {
             let videoPath = videoComment?.video.videoPath,
             let videoUrl = URL(string: videoPath),
             let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            //let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            FileManager.default.fileExists(atPath: exportUrl.path)
-            // FileManager.default.fileExists(atPath: smallExportUrl.path)
+            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            FileManager.default.fileExists(atPath: exportUrl.path),
+            FileManager.default.fileExists(atPath: smallExportUrl.path)
             else {
                 DispatchQueue.main.async {
                     self.saveButton.setTitle("Can't save..", for: .normal)
@@ -224,7 +226,7 @@ extension GenerateViewController {
         
         PHPhotoLibrary.shared().performChanges({
             _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportUrl)
-            // _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
+            _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
         }, completionHandler: { (success, error) in
             DispatchQueue.main.async {
                 self.saveButton.setTitle("Saved!", for: .normal)
@@ -239,8 +241,8 @@ extension GenerateViewController {
             textField.keyboardType = .numberPad
         })
         let confirmAction = UIAlertAction(title: "OK", style: .default, handler: {(_ action: UIAlertAction) -> Void in
-            guard let text = alertController.textFields?[0].text, let number = Float(text) else { return }
-            exportWidth = CGFloat(number)
+            guard let text = alertController.textFields?[0].text, let _ = Float(text) else { return }
+            // exportWidth = CGFloat(number)
             self.widthButton.setTitle("Video Width: ~\(text)pt", for: .normal)
             self.reset()
         })
@@ -249,6 +251,18 @@ extension GenerateViewController {
         })
         alertController.addAction(cancelAction)
         present(alertController, animated: true)
+    }
+    
+    @IBAction func upload() {
+        guard
+            let videoComment = videoComment,
+            let videoUrl = URL(string: videoComment.video.videoPath),
+            let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent) else {
+                return
+        }
+        
+        upload(videoId: videoComment.video.id, exportUrl: exportUrl, smallExportUrl: smallExportUrl)
     }
 }
 
@@ -377,6 +391,7 @@ extension GenerateViewController {
     
     func upload(videoId: String, exportUrl: URL, smallExportUrl: URL) {
         let uploadUrl = "https://api4.vibbidi.com/v5.0/admin/sgifs"
+        // let uploadUrl = "http://v4-api.vibbidi.com:8018/v5.0/admin/sgifs"
         uploadRequest?.cancel()
         
         Alamofire.upload(
