@@ -186,7 +186,7 @@ private extension VideoMerge {
         // Output video composition
         let outputComposition = AVMutableVideoComposition()
         outputComposition.instructions = [outputCompositionInstruction]
-        outputComposition.frameDuration = CMTimeMake(1, 30)
+        outputComposition.frameDuration = CMTimeMake(1, asset.duration.timescale)
         outputComposition.renderSize = exportSize
         
         // Add effects
