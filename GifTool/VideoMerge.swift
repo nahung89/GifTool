@@ -305,7 +305,7 @@ private extension VideoMerge {
             let moveAnimation =  CABasicAnimation(keyPath: "position.x")
             moveAnimation.byValue = -(videoFrame.width + commentView.bounds.width)
             moveAnimation.beginTime = comment.startAt
-            moveAnimation.duration = commentView.duration(speed: source.video.commentSpeed, width: videoFrame.width)
+            moveAnimation.duration = commentView.duration(speed: source.video.commentSpeed, videoWidth: videoFrame.width)
             moveAnimation.isRemovedOnCompletion = false
             moveAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
             moveAnimation.fillMode = kCAFillModeForwards
@@ -318,7 +318,7 @@ private extension VideoMerge {
         }
         
         let watermark = WatermarkView(scale: scale)
-        watermark.frame.origin = CGPoint(x: videoFrame.width - watermark.frame.width, y: 0)
+        watermark.frame.origin = CGPoint(x: 0, y: 0)
         watermark.frame.size.height = lineHeight
         overlayLayer.addSublayer(watermark.layer)
         overlayViews.append(watermark) // *Very importance: To store instance, otherwise it can't render

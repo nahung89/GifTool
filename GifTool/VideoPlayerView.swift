@@ -41,7 +41,7 @@ class VideoPlayerView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         playLayer.frame = bounds
-        watermark.frame.origin = CGPoint(x: frame.width - watermark.frame.width, y: frame.height - watermark.frame.height)
+        watermark.frame.origin = CGPoint(x: 0, y: frame.height - watermark.frame.height)
     }
     
     func initView() {

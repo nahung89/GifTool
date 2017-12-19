@@ -28,6 +28,7 @@ class GenerateViewController: UIViewController {
     
     @IBOutlet weak var exportLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var saveButton: UIButton!
     
     private(set) var videoId: String?
     
@@ -211,7 +212,9 @@ extension GenerateViewController {
             FileManager.default.fileExists(atPath: exportUrl.path),
             FileManager.default.fileExists(atPath: smallExportUrl.path)
             else {
-                exportLabel.text = "Error. Doesn't have exported files."
+                DispatchQueue.main.async {
+                    self.saveButton.setTitle("Can't save.", for: .normal)
+                }
                 return
         }
         
@@ -219,7 +222,9 @@ extension GenerateViewController {
             _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportUrl)
             _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
         }, completionHandler: { (success, error) in
-            self.exportLabel.text = "Saved To Camera Roll!"
+            DispatchQueue.main.async {
+                self.saveButton.setTitle("Saved to CameraRoll", for: .normal)
+            }
         })
     }
 }

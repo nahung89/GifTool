@@ -72,6 +72,14 @@ class ListSourceController: UIViewController {
 
 extension ListSourceController {
     
+    @IBAction func refresh() {
+        request()
+        preloadGifs()
+    }
+}
+
+extension ListSourceController {
+    
     func request() {
         log.info("Request: \(sourceUrl)")
         RxAlamofire.requestJSON(.get, sourceUrl)

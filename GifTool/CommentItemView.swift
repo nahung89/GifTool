@@ -85,13 +85,15 @@ class CommentItemView: UIView {
         frame.size.width = maxX
     }
     
-    func duration(speed: TimeInterval, width: CGFloat) -> TimeInterval {
-        return speed + Double(frame.width / width) * speed
+    func duration(speed: TimeInterval, videoWidth: CGFloat) -> TimeInterval {
+        // return speed + Double(frame.width / videoWidth) * speed // Too slow
+        return Double((frame.width + videoWidth) / (CGFloat(speed) * textFont.pointSize)) // Same with VTV-Tool
+        // return Double((frame.width + videoWidth) / (CGFloat(speed) * frame.height)) // To fast
     }
     
     func animate(speed: TimeInterval, delay: TimeInterval) {
         guard let superview = self.superview else { return }
-        let duration = self.duration(speed: speed, width: superview.frame.width)
+        let duration = self.duration(speed: speed, videoWidth: superview.frame.width)
         UIView.animate(withDuration: duration, delay: delay, options: [.curveLinear, .allowUserInteraction], animations: {
             self.frame.origin.x = -self.frame.width
         }) { _ in

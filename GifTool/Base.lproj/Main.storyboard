@@ -123,7 +123,13 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Source GIFs" id="6ap-CZ-4bL"/>
+                    <navigationItem key="navigationItem" title="Source GIFs" id="8hM-np-DMo">
+                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="refresh" id="SUK-Qe-tM7">
+                            <connections>
+                                <action selector="refresh" destination="BYZ-38-t0r" id="gbo-Vp-tyJ"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="emojiStatusLabel" destination="AxB-bX-pYL" id="Mfc-et-Eo3"/>
                         <outlet property="progressView" destination="tLN-IX-pU3" id="ZoD-L2-Q6K"/>
@@ -210,6 +216,7 @@
                     <connections>
                         <outlet property="exportLabel" destination="qti-10-LSh" id="BfA-5e-aDT"/>
                         <outlet property="progressView" destination="TMn-Pc-gOV" id="YaG-E2-2rx"/>
+                        <outlet property="saveButton" destination="idJ-rI-xdY" id="048-su-7Yb"/>
                         <outlet property="videoArea" destination="xgB-7M-4ON" id="21b-VX-Tx1"/>
                         <outlet property="videoHeightConstraint" destination="wYx-PA-OBy" id="1Gu-1n-q47"/>
                     </connections>

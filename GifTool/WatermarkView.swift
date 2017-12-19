@@ -32,7 +32,13 @@ class WatermarkView: UIView {
     }
     
     func initView() {
-        label.frame = CGRect(x: 0, y: 0, width: 0, height: CommentItemView.Design.height * scale)
+        imageView.image = #imageLiteral(resourceName: "VibbidiIcon")
+        imageView.frame = CGRect(x: 8 * scale, y: 0, width: Design.logoHeight * scale, height: Design.logoHeight * scale)
+        addSubview(imageView)
+        imageView.layer.cornerRadius = 5 * scale
+        imageView.layer.masksToBounds = true
+        
+        label.frame = CGRect(x: imageView.frame.maxX + 8 * scale, y: 0, width: 0, height: CommentItemView.Design.height * scale)
         label.textColor = .white
         label.text = "vibbidi.com"
         label.textAlignment = .right
@@ -47,13 +53,7 @@ class WatermarkView: UIView {
         label.frame.size.height = CommentItemView.Design.height * scale
         addSubview(label)
         
-        imageView.image = #imageLiteral(resourceName: "VibbidiIcon")
-        imageView.frame = CGRect(x: label.frame.maxX + 8 * scale, y: 0, width: Design.logoHeight * scale, height: Design.logoHeight * scale)
-        addSubview(imageView)
-        imageView.layer.cornerRadius = 5 * scale
-        imageView.layer.masksToBounds = true
-        
-        frame.size.width = imageView.frame.maxX + 8 * scale
+        frame.size.width = label.frame.maxX + 8 * scale
     }
     
     override func layoutSubviews() {
