@@ -15,6 +15,7 @@ class WatermarkView: UIView {
     let imageView = UIImageView()
     
     struct Design {
+        static let height: CGFloat = 48
         static let font: UIFont = UIFont.FontHeavyBold(20)
         static let logoHeight: CGFloat = 32
         static let padding: CGFloat = 8
@@ -24,7 +25,7 @@ class WatermarkView: UIView {
     
     init(scale: CGFloat = 1) {
         self.scale = scale
-        super.init(frame: CGRect(x: 0, y: 0, width: 0, height: CommentItemView.Design.height * scale))
+        super.init(frame: CGRect(x: 0, y: 0, width: 0, height: Design.height * scale))
         initView()
     }
     
@@ -41,7 +42,7 @@ class WatermarkView: UIView {
         imageView.layer.cornerRadius = newPadding
         imageView.layer.masksToBounds = true
         
-        label.frame = CGRect(x: imageView.frame.maxX + newPadding, y: 0, width: 0, height: CommentItemView.Design.height * scale)
+        label.frame = CGRect(x: imageView.frame.maxX + newPadding, y: 0, width: 0, height: frame.height)
         label.textColor = .white
         label.text = "vibbidi.com"
         label.textAlignment = .right
@@ -53,10 +54,12 @@ class WatermarkView: UIView {
             label.font = designFont.withSize(designFont.pointSize * scale)
         }
         label.sizeToFit()
-        label.frame.size.height = CommentItemView.Design.height * scale
+        label.frame.size.height = frame.height
         addSubview(label)
         
         frame.size.width = label.frame.maxX + newPadding
+        
+        makeColor(includeSelf: true) // ERROR
     }
     
     override func layoutSubviews() {

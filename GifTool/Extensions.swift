@@ -113,7 +113,7 @@ extension UIView {
 
     func makeColor(includeSelf: Bool = false) {
         if includeSelf {
-            self.backgroundColor = UIColor.random()
+            self.backgroundColor = UIColor.random(alpha: 0.7)
         }
         for view in subviews {
             view.backgroundColor = UIColor.random(alpha: 0.5)

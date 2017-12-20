@@ -38,7 +38,7 @@ class VideoMerge {
     
     private let kDisplayWidth: CGFloat = UIScreen.main.bounds.width
     // private let kExportWidth: CGFloat = 600
-    private let kNumberOfLines: CGFloat = 6
+    private let kNumberOfLines: CGFloat = 5
     
     var exportSize: CGSize? {
         return exportSession?.videoComposition?.renderSize
@@ -286,7 +286,13 @@ private extension VideoMerge {
         
         // let composeHeight = videoFrame.height * kDisplayWidth / videoFrame.width
         let scale: CGFloat = videoFrame.width / kDisplayWidth
-        let lineHeight = videoFrame.height / kNumberOfLines
+        
+        let watermark = WatermarkView(scale: scale)
+        watermark.frame.origin = CGPoint(x: 0, y: 0)
+        overlayLayer.addSublayer(watermark.layer)
+        overlayViews.append(watermark) // *Very importance: To store instance, otherwise it can't render
+        
+        let lineHeight = (videoFrame.height - watermark.frame.height) / kNumberOfLines
         
         let texts = source.comments
         
@@ -316,12 +322,6 @@ private extension VideoMerge {
             overlayLayer.addSublayer(commentView.layer)
             overlayViews.append(commentView) // *Very importance: Must store instance, otherwise it can't render
         }
-        
-        let watermark = WatermarkView(scale: scale)
-        watermark.frame.origin = CGPoint(x: 0, y: 0)
-        watermark.frame.size.height = lineHeight
-        overlayLayer.addSublayer(watermark.layer)
-        overlayViews.append(watermark) // *Very importance: To store instance, otherwise it can't render
         
         let parentLayer = CALayer()
         parentLayer.frame = videoFrame
