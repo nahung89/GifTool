@@ -15,8 +15,8 @@ class CommentItemView: UIView {
     
     struct Design {
         static let duration: TimeInterval = 5
-        static let font: UIFont = UIFont.FontHeavyBold(20)
-        static let height: CGFloat = 32
+        static let font: UIFont = UIFont.FontHeavyBold(28)
+        static let height: CGFloat = 45
     }
     
     private let scale: CGFloat
