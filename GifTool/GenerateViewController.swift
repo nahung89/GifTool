@@ -159,9 +159,17 @@ class GenerateViewController: UIViewController {
             self.progressView.progress = Float(progress)
             }, onCompletion: { [weak self] (videoData, thumbData, error) in
                 guard let `self` = self else { return }
-                if case let .some(.finished(url)) = self.videoMerge?.state {
+                guard let state = self.videoMerge?.state else { return }
+                
+                switch state {
+                case let .finished(url):
                     log.info("Exported Big: \(url)")
                     self.processSmall(cacheVideoUrl)
+                case let .failed(error):
+                    self.exportLabel.text = "Error. Export Fail: \(error.logable)"
+                    self.navigationController?.popViewController(animated: true)
+                default:
+                    break
                 }
         })
     }
@@ -189,11 +197,22 @@ class GenerateViewController: UIViewController {
             self.progressView.progress = Float(progress)
             }, onCompletion: { [weak self] (videoData, thumbData, error) in
                 guard let `self` = self else { return }
-                if case let .some(.finished(url)) = self.videoMerge?.state,
-                    case let .some(.finished(smallUrl)) = self.smallVideoMerge?.state,
-                    let videoId = self.videoId {
-                    self.playExportedVideo(url)
-                    self.upload(videoId: videoId, exportUrl: url, smallExportUrl: smallUrl)
+                guard let state = self.smallVideoMerge?.state else { return }
+                
+                switch state {
+                case let .finished(url):
+                    if case let .some(.finished(url)) = self.videoMerge?.state,
+                        case let .some(.finished(smallUrl)) = self.smallVideoMerge?.state,
+                        let videoId = self.videoId {
+                        self.playExportedVideo(url)
+                        self.upload(videoId: videoId, exportUrl: url, smallExportUrl: smallUrl)
+                    }
+                case let .failed(error):
+                    self.exportLabel.text = "Error. Export Fail: \(error.logable)"
+                    self.navigationController?.popViewController(animated: true)
+                    
+                default:
+                    break
                 }
         })
     }

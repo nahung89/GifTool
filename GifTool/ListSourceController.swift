@@ -95,7 +95,7 @@ extension ListSourceController {
     
     @IBAction func autoRun() {
         AppDelegate.shared().autoRun = true
-        guard let video = self.videos.filter({ $0.isComplied != true }).first else { return }
+        guard let video = self.videos.filter({ $0.isCompleted == true && $0.isComplied != true }).first else { return }
         self.performSegue(withIdentifier: "generate", sender: video)
     }
 }
