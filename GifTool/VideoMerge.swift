@@ -52,7 +52,7 @@ class VideoMerge {
     }
     
     deinit {
-        print("\(self) dealloc")
+        log.info("DEINIT!!!")
     }
     
     func startExportVideo(onProgress progressBlock: VideoExportProgressBlock? = nil, onCompletion completionBlock: VideoExportCompletionBlock? = nil) {

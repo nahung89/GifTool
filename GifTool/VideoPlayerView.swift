@@ -25,6 +25,10 @@ class VideoPlayerView: UIView {
     fileprivate let disposeBag = DisposeBag()
     fileprivate var itemDisposeBag = DisposeBag()
     
+    deinit {
+        log.info("DEINIT!!!")
+    }
+    
     convenience init() {
         self.init(frame: CGRect.zero)
     }

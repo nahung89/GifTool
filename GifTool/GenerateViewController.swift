@@ -61,10 +61,26 @@ class GenerateViewController: UIViewController {
         autoRunButton.setTitle(AppDelegate.shared().autoRun ? "Auto Compile: Running" : "Auto Compile: Stopped", for: .normal)
     }
     
-    deinit {
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         playerView.clear()
+        
         downloadRequest?.cancel()
         uploadRequest?.cancel()
+        
+        videoMerge?.stopExportVideo()
+        smallVideoMerge?.stopExportVideo()
+    }
+    
+    deinit {
+        log.info("DEINIT!!!")
+        playerView.clear()
+        
+        downloadRequest?.cancel()
+        uploadRequest?.cancel()
+        
+        videoMerge?.stopExportVideo()
+        smallVideoMerge?.stopExportVideo()
     }
     
     func set(video: Video) {
@@ -221,8 +237,8 @@ extension GenerateViewController {
             FileManager.default.fileExists(atPath: exportUrl.path),
             FileManager.default.fileExists(atPath: smallExportUrl.path)
             else {
-                DispatchQueue.main.async {
-                    self.saveButton.setTitle("Can't save..", for: .normal)
+                DispatchQueue.main.async { [weak self] in
+                    self?.saveButton.setTitle("Can't save..", for: .normal)
                 }
                 return
         }
@@ -231,8 +247,8 @@ extension GenerateViewController {
             _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportUrl)
             _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
         }, completionHandler: { (success, error) in
-            DispatchQueue.main.async {
-                self.saveButton.setTitle("Saved!", for: .normal)
+            DispatchQueue.main.async { [weak self] in
+                self?.saveButton.setTitle("Saved!", for: .normal)
             }
         })
     }
@@ -375,21 +391,21 @@ extension GenerateViewController {
         
         downloadRequest = Alamofire.download(loadURL, to: destination)
             .downloadProgress{ progress in
-                DispatchQueue.main.async {
-                    self.exportLabel.text = "Downloading video: \(progress.fractionCompleted)..."
-                    self.progressView.progress = Float(progress.fractionCompleted)
+                DispatchQueue.main.async { [weak self] in
+                    self?.exportLabel.text = "Downloading video: \(progress.fractionCompleted)..."
+                    self?.progressView.progress = Float(progress.fractionCompleted)
                 }
             }
             .response { response in
                 if let err = response.error {
-                    DispatchQueue.main.async {
-                        self.exportLabel.text = "Error. Download fail: \(err.localizedDescription)"
+                    DispatchQueue.main.async { [weak self] in
+                        self?.exportLabel.text = "Error. Download fail: \(err.localizedDescription)"
                         log.error("Error: \(err)")
                     }
                 } else {
-                    DispatchQueue.main.async {
-                        self.exportLabel.text = "Download Completed."
-                        self.process(saveURL)
+                    DispatchQueue.main.async { [weak self] in
+                        self?.exportLabel.text = "Download Completed."
+                        self?.process(saveURL)
                     }
                 }
         }
