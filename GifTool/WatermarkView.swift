@@ -58,8 +58,6 @@ class WatermarkView: UIView {
         addSubview(label)
         
         frame.size.width = label.frame.maxX + newPadding
-        
-        makeColor(includeSelf: true) // ERROR
     }
     
     override func layoutSubviews() {

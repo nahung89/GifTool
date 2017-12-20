@@ -83,8 +83,6 @@ class CommentItemView: UIView {
             }
         }
         frame.size.width = maxX
-        
-        makeColor(includeSelf: true) // ERROR
     }
     
     func duration(speed: TimeInterval, videoWidth: CGFloat) -> TimeInterval {
