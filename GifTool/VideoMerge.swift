@@ -267,8 +267,8 @@ private extension VideoMerge {
         let exportSize = CGSize(width: ceil(naturalSize.width * tmpScale / 16) * 16,
                                 height:ceil(naturalSize.height * tmpScale / 16) * 16)
         
-        let scale = max(exportSize.width / naturalSize.width, exportSize.height / naturalSize.height)
-        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: scale, y: scale)
+        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: exportSize.width / naturalSize.width,
+                                                                          y: exportSize.height / naturalSize.height)
         
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoCompositionTrack)
         instruction.setTransform(transform, at: kCMTimeZero)
