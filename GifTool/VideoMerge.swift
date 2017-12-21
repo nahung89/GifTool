@@ -321,7 +321,7 @@ private extension VideoMerge {
             
             let moveAnimation =  CABasicAnimation(keyPath: "position.x")
             moveAnimation.byValue = -(videoFrame.width + commentView.bounds.width)
-            moveAnimation.beginTime = comment.startAt != 0 ? comment.startAt : 0.001 // ERROR that can't show comment at 0.0 ???
+            moveAnimation.beginTime = comment.startAt != 0 ? comment.startAt : 0.001 // Fixed bug: that can't show comment at 0.0 ???
             moveAnimation.duration = commentView.duration(speed: source.video.commentSpeed, videoWidth: videoFrame.width)
             moveAnimation.isRemovedOnCompletion = false
             moveAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)

@@ -437,42 +437,39 @@ extension GenerateViewController {
     }
     
     func upload(videoId: String, exportUrl: URL, smallExportUrl: URL) {
-        // ERROR: Open it
-        return
-        
-//        let uploadUrl = "https://api4.vibbidi.com/v5.0/admin/sgifs"
-//        // let uploadUrl = "http://v4-api.vibbidi.com:8018/v5.0/admin/sgifs"
-//        uploadRequest?.cancel()
-//
-//        Alamofire.upload(
-//            multipartFormData: { multipartFormData in
-//                multipartFormData.append(exportUrl, withName: "file")
-//                multipartFormData.append(smallExportUrl, withName: "preview")
-//                multipartFormData.append(videoId.data(using: String.Encoding.utf8)!, withName: "id")
-//        },
-//            to: uploadUrl,
-//            encodingCompletion: { [weak self] encodingResult in
-//                guard let `self` = self else { return }
-//                switch encodingResult {
-//                case .success(let upload, _, _):
-//                    self.uploadRequest = upload
-//                    upload.uploadProgress(queue: DispatchQueue.main, closure: { [weak self] (progress) in
-//                        self?.exportLabel.text = "Uploading video: \(progress.fractionCompleted)..."
-//                        self?.progressView.progress = Float(progress.fractionCompleted)
-//                    })
-//
-//                    upload.responseJSON { [weak self] response in
-//                        self?.exportLabel.text = response.description
-//                        AppDelegate.shared().finishComplileVideo.onNext(videoId)
-//                        if AppDelegate.shared().autoRun {
-//                            self?.navigationController?.popViewController(animated: true)
-//                        }
-//                    }
-//                case .failure(let encodingError):
-//                    self.exportLabel.text = "Error. Uploading video: \(encodingError)..."
-//                    log.error(encodingError)
-//                }
-//        })
+        let uploadUrl = "https://api4.vibbidi.com/v5.0/admin/sgifs"
+        // let uploadUrl = "http://v4-api.vibbidi.com:8018/v5.0/admin/sgifs"
+        uploadRequest?.cancel()
+
+        Alamofire.upload(
+            multipartFormData: { multipartFormData in
+                multipartFormData.append(exportUrl, withName: "file")
+                multipartFormData.append(smallExportUrl, withName: "preview")
+                multipartFormData.append(videoId.data(using: String.Encoding.utf8)!, withName: "id")
+        },
+            to: uploadUrl,
+            encodingCompletion: { [weak self] encodingResult in
+                guard let `self` = self else { return }
+                switch encodingResult {
+                case .success(let upload, _, _):
+                    self.uploadRequest = upload
+                    upload.uploadProgress(queue: DispatchQueue.main, closure: { [weak self] (progress) in
+                        self?.exportLabel.text = "Uploading video: \(progress.fractionCompleted)..."
+                        self?.progressView.progress = Float(progress.fractionCompleted)
+                    })
+
+                    upload.responseJSON { [weak self] response in
+                        self?.exportLabel.text = response.description
+                        AppDelegate.shared().finishComplileVideo.onNext(videoId)
+                        if AppDelegate.shared().autoRun {
+                            self?.navigationController?.popViewController(animated: true)
+                        }
+                    }
+                case .failure(let encodingError):
+                    self.exportLabel.text = "Error. Uploading video: \(encodingError)..."
+                    log.error(encodingError)
+                }
+        })
     }
 }
 
