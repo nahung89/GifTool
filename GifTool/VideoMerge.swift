@@ -49,9 +49,11 @@ class VideoMerge {
     init(videoUrl: URL, source: VideoComment, title: String, exportUrl: URL, exportWidth: CGFloat) {
         self.videoUrl = videoUrl
         self.source = source
-        self.exportUrl = exportUrl
-        self.kExportWidth = exportWidth
         self.title = title
+        
+        self.exportUrl = exportUrl
+        
+        self.kExportWidth = exportWidth
         self.kTopAreaHeight = TitleView.calculateSize(text: title, videoWidth: exportWidth).height
     }
     
@@ -187,8 +189,6 @@ private extension VideoMerge {
         let exportSize = CGSize(width: ceil(naturalSize.width * scale / 16) * 16,
                                 height:ceil(naturalSize.height * scale / 16) * 16 + kTopAreaHeight)
         
-        log.info("export-size: \(exportSize)")
-        
         // Output video composition
         let outputComposition = AVMutableVideoComposition()
         outputComposition.instructions = [outputCompositionInstruction]
@@ -270,15 +270,12 @@ private extension VideoMerge {
         let naturalSize = videoCompositionTrack.naturalSize
         
         let tmpScale: CGFloat = kExportWidth / naturalSize.width
-        let exportSize = CGSize(width: ceil(naturalSize.width * tmpScale / 16) * 16,
+        let exportVideoSize = CGSize(width: ceil(naturalSize.width * tmpScale / 16) * 16,
                                 height:ceil(naturalSize.height * tmpScale / 16) * 16)
         
-        log.info("video-export-size: \(exportSize)")
-        
-        let scale = max(exportSize.width / naturalSize.width, exportSize.height / naturalSize.height)
-        
-        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: exportSize.width / naturalSize.width,
-                                                                          y: (exportSize.height + kTopAreaHeight) / naturalSize.height)
+        // Make transform for video and top black area
+        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: exportVideoSize.width / naturalSize.width,
+                                                                          y: (exportVideoSize.height + kTopAreaHeight) / naturalSize.height)
         
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoCompositionTrack)
         instruction.setTransform(transform, at: kCMTimeZero)
@@ -287,8 +284,8 @@ private extension VideoMerge {
     }
     
     private func addEffect(to outputComposition: AVMutableVideoComposition) {
-        var exportFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
-        var videoFrame = CGRect(x: 0, y: 0, width: exportFrame.width, height: exportFrame.height - kTopAreaHeight)
+        let exportFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
+        let videoFrame = CGRect(x: 0, y: 0, width: exportFrame.width, height: exportFrame.height - kTopAreaHeight)
         
         log.info("export-frame: \(exportFrame)")
         log.info("video-frame: \(videoFrame)")
@@ -350,16 +347,6 @@ private extension VideoMerge {
         
         parentLayer.addSublayer(videoLayer)
         parentLayer.addSublayer(overlayLayer)
-        
-//        parentLayer.backgroundColor = UIColor.red.cgColor
-//        videoLayer.backgroundColor = UIColor.blue.withAlphaComponent(0.5).cgColor
-//        overlayLayer.backgroundColor = UIColor.green.withAlphaComponent(0.5).cgColor
-        
-        print("parent-layer: \(parentLayer.description)")
-        for sublayer in parentLayer.sublayers! {
-            print("sub-layer: \(sublayer)")
-        }
-        
         
         outputComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayer, in: parentLayer)
     }

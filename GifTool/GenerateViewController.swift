@@ -150,9 +150,7 @@ class GenerateViewController: UIViewController {
         
         videoMerge = VideoMerge(videoUrl: cacheVideoUrl,
                                 source: videoComment,
-                                // title: "",
-                                // title: "The Struggles Of A Lactose Intolerant Cheese Lover",
-                                title: "Hard Liquor And I Don’t Mix",
+                                title: videoComment.video.title,
                                 exportUrl: exportUrl,
                                 exportWidth: exportWidth)
         
@@ -167,8 +165,7 @@ class GenerateViewController: UIViewController {
                 switch state {
                 case let .finished(url):
                     log.info("Exported Big: \(url)")
-                    self.playExportedVideo(url)
-                    // self.processSmall(cacheVideoUrl)
+                    self.processSmall(cacheVideoUrl)
                 case let .failed(error):
                     self.exportLabel.text = "Error. Export Fail: \(error.logable)"
                     self.navigationController?.popViewController(animated: true)
@@ -192,7 +189,7 @@ class GenerateViewController: UIViewController {
         
         smallVideoMerge = VideoMerge(videoUrl: cacheVideoUrl,
                                      source: videoComment,
-                                     title: "The Struggles Of A Lactose Intolerant Cheese Lover",
+                                     title: "",
                                      exportUrl: smallExportUrl,
                                      exportWidth: smallExportWidth)
         
@@ -257,9 +254,9 @@ extension GenerateViewController {
             let videoPath = videoComment?.video.videoPath,
             let videoUrl = URL(string: videoPath),
             let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            //let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            FileManager.default.fileExists(atPath: exportUrl.path)
-            // FileManager.default.fileExists(atPath: smallExportUrl.path)
+            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            FileManager.default.fileExists(atPath: exportUrl.path),
+            FileManager.default.fileExists(atPath: smallExportUrl.path)
             else {
                 DispatchQueue.main.async { [weak self] in
                     self?.saveButton.setTitle("Can't save..", for: .normal)
@@ -269,7 +266,7 @@ extension GenerateViewController {
         
         PHPhotoLibrary.shared().performChanges({
             _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportUrl)
-            // _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
+            _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
         }, completionHandler: { (success, error) in
             DispatchQueue.main.async { [weak self] in
                 self?.saveButton.setTitle("Saved!", for: .normal)
@@ -321,8 +318,10 @@ private extension GenerateViewController {
         
         videoArea.removeAllSubview()
         
+        let titleHeight = TitleView.calculateSize(text: videoComment.video.title, videoWidth: videoArea.frame.width).height
+        
         // Update video area
-        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
+        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width + titleHeight
         view.layoutIfNeeded()
         playerView.frame = videoArea.bounds
         videoArea.addSubview(playerView)
@@ -331,28 +330,28 @@ private extension GenerateViewController {
         playerView.setURL(exportUrl, showMark: false)
     }
     
-    func playDownloadVideo(_ downloadUrl: URL) {
-        guard let videoComment = videoComment else { return }
-        
-        // Update video area
-        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
-        videoArea.layoutIfNeeded()
-        playerView.frame = videoArea.bounds
-        videoArea.addSubview(playerView)
-        
-        playerDisposeBag = DisposeBag()
-        playerView.progress.asDriver().drive(onNext: { [unowned self] (progress) in
-            if let time = progress {
-                guard let comment = self.dequeueComment(time) else { return }
-                self.show(comment: comment)
-            } else {
-                self.commentsQueue = videoComment.comments
-                self.videoArea.removeAllSubview()
-            }
-        }).disposed(by: playerDisposeBag)
-        
-        playerView.setURL(downloadUrl, showMark: true)
-    }
+//    func playDownloadVideo(_ downloadUrl: URL) {
+//        guard let videoComment = videoComment else { return }
+//        
+//        // Update video area
+//        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
+//        videoArea.layoutIfNeeded()
+//        playerView.frame = videoArea.bounds
+//        videoArea.addSubview(playerView)
+//        
+//        playerDisposeBag = DisposeBag()
+//        playerView.progress.asDriver().drive(onNext: { [unowned self] (progress) in
+//            if let time = progress {
+//                guard let comment = self.dequeueComment(time) else { return }
+//                self.show(comment: comment)
+//            } else {
+//                self.commentsQueue = videoComment.comments
+//                self.videoArea.removeAllSubview()
+//            }
+//        }).disposed(by: playerDisposeBag)
+//        
+//        playerView.setURL(downloadUrl, showMark: true)
+//    }
 
     func dequeueComment(_ time: TimeInterval) -> Comment? {
         for (idx, comment) in commentsQueue.enumerated() {
@@ -438,6 +437,7 @@ extension GenerateViewController {
     }
     
     func upload(videoId: String, exportUrl: URL, smallExportUrl: URL) {
+        // ERROR: Open it
         return
         
 //        let uploadUrl = "https://api4.vibbidi.com/v5.0/admin/sgifs"

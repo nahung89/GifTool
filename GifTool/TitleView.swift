@@ -25,14 +25,15 @@ extension TitleView {
         label.textAlignment = .center
         label.numberOfLines = 0
         
-        let height: CGFloat = label.sizeThatFits(CGSize(width: videoWidth - padding.left - padding.right, height: CGFloat.greatestFiniteMagnitude)).height
+        let height: CGFloat = label.sizeThatFits(CGSize(width: videoWidth - padding.left - padding.right, height: CGFloat.greatestFiniteMagnitude)).height + padding.top + padding.bottom
+        let heightForExport = ceil(height / 16) * 16
         
-        return CGSize(width: videoWidth, height: height + padding.top + padding.bottom)
+        return CGSize(width: videoWidth, height: heightForExport)
     }
 }
 
 class TitleView: UIView {
-
+    
     struct Design {
         static let width: CGFloat = 375
         static let font: UIFont = UIFont.FontHeavyBold(24)
@@ -56,9 +57,9 @@ class TitleView: UIView {
     
     func initView() {
         let padding = UIEdgeInsetsMake(Design.padding.top * scale,
-                                                 Design.padding.left * scale,
-                                                 Design.padding.bottom * scale,
-                                                 Design.padding.right * scale)
+                                       Design.padding.left * scale,
+                                       Design.padding.bottom * scale,
+                                       Design.padding.right * scale)
         
         titleLabel.frame = CGRect(x: padding.left,
                                   y: padding.top,
@@ -73,10 +74,5 @@ class TitleView: UIView {
         titleLabel.font = designFont.withSize(designFont.pointSize * scale)
         addSubview(titleLabel)
     }
-    
-//    override func layoutSubviews() {
-//        super.layoutSubviews()
-//        label.frame.origin.y = (frame.height - label.frame.height) / 2
-//        imageView.frame.origin.y = (frame.height - imageView.frame.height) / 2
-//    }
 }
+
