@@ -332,7 +332,7 @@ private extension GenerateViewController {
     
 //    func playDownloadVideo(_ downloadUrl: URL) {
 //        guard let videoComment = videoComment else { return }
-//        
+//
 //        // Update video area
 //        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
 //        videoArea.layoutIfNeeded()
@@ -349,7 +349,7 @@ private extension GenerateViewController {
 //                self.videoArea.removeAllSubview()
 //            }
 //        }).disposed(by: playerDisposeBag)
-//        
+//
 //        playerView.setURL(downloadUrl, showMark: true)
 //    }
 
