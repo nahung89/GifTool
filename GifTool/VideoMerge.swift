@@ -181,7 +181,9 @@ private extension VideoMerge {
         let naturalSize = videoCompositionTrack.naturalSize
         let scale: CGFloat = kExportWidth / naturalSize.width
         let exportSize = CGSize(width: ceil(naturalSize.width * scale / 16) * 16,
-                                height:ceil(naturalSize.height * scale / 16) * 16)
+                                height:ceil(naturalSize.height * scale / 16) * 16 + 100)
+        
+        log.info("export-size: \(exportSize)")
         
         // Output video composition
         let outputComposition = AVMutableVideoComposition()
@@ -267,8 +269,12 @@ private extension VideoMerge {
         let exportSize = CGSize(width: ceil(naturalSize.width * tmpScale / 16) * 16,
                                 height:ceil(naturalSize.height * tmpScale / 16) * 16)
         
+        log.info("video-export-size: \(exportSize)")
+        
         let scale = max(exportSize.width / naturalSize.width, exportSize.height / naturalSize.height)
-        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: scale, y: scale)
+        
+        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: exportSize.width / naturalSize.width,
+                                                                          y: (exportSize.height + 100) / naturalSize.height)
         
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoCompositionTrack)
         instruction.setTransform(transform, at: kCMTimeZero)
@@ -277,7 +283,15 @@ private extension VideoMerge {
     }
     
     private func addEffect(to outputComposition: AVMutableVideoComposition) {
-        let videoFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
+        var exportFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
+        var videoFrame = CGRect(x: 0, y: 0, width: exportFrame.width, height: exportFrame.height - 100)
+
+        
+//        var videoFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
+//        var exportFrame = CGRect(x: 0, y: 0, width: videoFrame.width, height: videoFrame.height + 100)
+        
+        log.info("export-frame: \(exportFrame)")
+        log.info("video-frame: \(videoFrame)")
         
         // Text layer container
         let overlayLayer = CALayer()
@@ -324,13 +338,23 @@ private extension VideoMerge {
         }
         
         let parentLayer = CALayer()
-        parentLayer.frame = videoFrame
+        parentLayer.frame = exportFrame
         
         let videoLayer = CALayer()
         videoLayer.frame = videoFrame
         
         parentLayer.addSublayer(videoLayer)
         parentLayer.addSublayer(overlayLayer)
+        
+        parentLayer.backgroundColor = UIColor.red.cgColor
+//        videoLayer.backgroundColor = UIColor.blue.withAlphaComponent(0.5).cgColor
+//        overlayLayer.backgroundColor = UIColor.green.withAlphaComponent(0.5).cgColor
+        
+        print("parent-layer: \(parentLayer.description)")
+        for sublayer in parentLayer.sublayers! {
+            print("sub-layer: \(sublayer)")
+        }
+        
         
         outputComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayer, in: parentLayer)
     }

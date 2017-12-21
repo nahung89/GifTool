@@ -128,9 +128,15 @@ extension ListSourceController {
                     self.filterVideos = self.videos
                 }
                 self.tableView.reloadData()
+                self.test()
                 }, onError: { [unowned self] (error) in
                     self.displayError(error.localizedDescription)
            }).disposed(by: disposeBag)
+    }
+    
+    func test() {
+        guard let video = videos.filter({ $0.id == "645617572865745" }).first else { return }
+        self.performSegue(withIdentifier: "generate", sender: video)
     }
     
     func preloadGifs() {
