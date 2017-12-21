@@ -25,9 +25,12 @@ class VideoMerge {
     
     private(set) var state: State = .none
     
-    private var videoUrl: URL
-    private var source: VideoComment
+    private let videoUrl: URL
+    private let source: VideoComment
+    private let title: String
+    
     private let kExportWidth: CGFloat // round width to multiply of 16
+    private let kTopAreaHeight: CGFloat
     private var overlayViews: [UIView] = []
     
     private var exportUrl: URL
@@ -37,18 +40,21 @@ class VideoMerge {
     private var completionBlock: VideoExportCompletionBlock?
     
     private let kDisplayWidth: CGFloat = UIScreen.main.bounds.width
-    // private let kExportWidth: CGFloat = 600
     private let kNumberOfLines: CGFloat = 5
     
     var exportSize: CGSize? {
         return exportSession?.videoComposition?.renderSize
     }
     
-    init(videoUrl: URL, source: VideoComment, exportUrl: URL, exportWidth: CGFloat) {
+    init(videoUrl: URL, source: VideoComment, title: String, exportUrl: URL, exportWidth: CGFloat) {
         self.videoUrl = videoUrl
         self.source = source
+        self.title = title
+        
         self.exportUrl = exportUrl
+        
         self.kExportWidth = exportWidth
+        self.kTopAreaHeight = TitleView.calculateSize(text: title, videoWidth: exportWidth).height
     }
     
     deinit {
@@ -181,7 +187,7 @@ private extension VideoMerge {
         let naturalSize = videoCompositionTrack.naturalSize
         let scale: CGFloat = kExportWidth / naturalSize.width
         let exportSize = CGSize(width: ceil(naturalSize.width * scale / 16) * 16,
-                                height:ceil(naturalSize.height * scale / 16) * 16)
+                                height:ceil(naturalSize.height * scale / 16) * 16 + kTopAreaHeight)
         
         // Output video composition
         let outputComposition = AVMutableVideoComposition()
@@ -264,11 +270,12 @@ private extension VideoMerge {
         let naturalSize = videoCompositionTrack.naturalSize
         
         let tmpScale: CGFloat = kExportWidth / naturalSize.width
-        let exportSize = CGSize(width: ceil(naturalSize.width * tmpScale / 16) * 16,
+        let exportVideoSize = CGSize(width: ceil(naturalSize.width * tmpScale / 16) * 16,
                                 height:ceil(naturalSize.height * tmpScale / 16) * 16)
         
-        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: exportSize.width / naturalSize.width,
-                                                                          y: exportSize.height / naturalSize.height)
+        // Make transform for video and top black area
+        let transform = videoCompositionTrack.preferredTransform.scaledBy(x: exportVideoSize.width / naturalSize.width,
+                                                                          y: (exportVideoSize.height + kTopAreaHeight) / naturalSize.height)
         
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoCompositionTrack)
         instruction.setTransform(transform, at: kCMTimeZero)
@@ -277,7 +284,11 @@ private extension VideoMerge {
     }
     
     private func addEffect(to outputComposition: AVMutableVideoComposition) {
-        let videoFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
+        let exportFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
+        let videoFrame = CGRect(x: 0, y: 0, width: exportFrame.width, height: exportFrame.height - kTopAreaHeight)
+        
+        log.info("export-frame: \(exportFrame)")
+        log.info("video-frame: \(videoFrame)")
         
         // Text layer container
         let overlayLayer = CALayer()
@@ -310,7 +321,7 @@ private extension VideoMerge {
             
             let moveAnimation =  CABasicAnimation(keyPath: "position.x")
             moveAnimation.byValue = -(videoFrame.width + commentView.bounds.width)
-            moveAnimation.beginTime = comment.startAt != 0 ? comment.startAt : 0.001 // ERROR that can't show comment at 0.0 ???
+            moveAnimation.beginTime = comment.startAt != 0 ? comment.startAt : 0.001 // Fixed bug: that can't show comment at 0.0 ???
             moveAnimation.duration = commentView.duration(speed: source.video.commentSpeed, videoWidth: videoFrame.width)
             moveAnimation.isRemovedOnCompletion = false
             moveAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
@@ -324,7 +335,12 @@ private extension VideoMerge {
         }
         
         let parentLayer = CALayer()
-        parentLayer.frame = videoFrame
+        parentLayer.frame = exportFrame
+        
+        let titleView = TitleView(text: title, videoSize: videoFrame.size)
+        titleView.frame.origin = CGPoint(x: 0, y: exportFrame.height - titleView.frame.height)
+        parentLayer.addSublayer(titleView.layer)
+        overlayViews.append(titleView) // *Very importance: Must store instance, otherwise it can't render
         
         let videoLayer = CALayer()
         videoLayer.frame = videoFrame

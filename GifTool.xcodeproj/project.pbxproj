@@ -27,6 +27,7 @@
 		114E65311FE8AAD0008F24FC /* getList.json in Resources */ = {isa = PBXBuildFile; fileRef = 114E65301FE8AAD0008F24FC /* getList.json */; };
 		114E65331FE8AB37008F24FC /* emojis.json in Resources */ = {isa = PBXBuildFile; fileRef = 114E65321FE8AB37008F24FC /* emojis.json */; };
 		114E65351FE8AB77008F24FC /* getItem.json in Resources */ = {isa = PBXBuildFile; fileRef = 114E65341FE8AB77008F24FC /* getItem.json */; };
+		1155C9461FEB7A53006C7A87 /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1155C9451FEB7A53006C7A87 /* TitleView.swift */; };
 		11C37DF41FE3510C00DC263D /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C37DF31FE3510C00DC263D /* Const.swift */; };
 		11C37DF61FE3515800DC263D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C37DF51FE3515800DC263D /* Extensions.swift */; };
 		11C37DF91FE351F100DC263D /* RxAlamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 11C37DF71FE351F000DC263D /* RxAlamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -105,6 +106,7 @@
 		114E65301FE8AAD0008F24FC /* getList.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = getList.json; sourceTree = "<group>"; };
 		114E65321FE8AB37008F24FC /* emojis.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = emojis.json; sourceTree = "<group>"; };
 		114E65341FE8AB77008F24FC /* getItem.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = getItem.json; sourceTree = "<group>"; };
+		1155C9451FEB7A53006C7A87 /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
 		11C37DF31FE3510C00DC263D /* Const.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		11C37DF51FE3515800DC263D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		11C37DF71FE351F000DC263D /* RxAlamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxAlamofire.framework; path = Carthage/Build/iOS/RxAlamofire.framework; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 				11E257841FE4D1A100601A1F /* VideoPlayerLayerView.swift */,
 				11E2577A1FE3C91300601A1F /* PreviewSourceCell.swift */,
 				11E2577E1FE424A100601A1F /* WatermarkView.swift */,
+				1155C9451FEB7A53006C7A87 /* TitleView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -399,6 +402,7 @@
 				11E2577D1FE4202C00601A1F /* VideoMerge.swift in Sources */,
 				11E257781FE3AB9700601A1F /* CommentItemView.swift in Sources */,
 				11E257871FE4D27800601A1F /* RxSwift+Extensions.swift in Sources */,
+				1155C9461FEB7A53006C7A87 /* TitleView.swift in Sources */,
 				11C37E0B1FE3605100DC263D /* AppError.swift in Sources */,
 				11E2577F1FE424A100601A1F /* WatermarkView.swift in Sources */,
 				11E2577B1FE3C91300601A1F /* PreviewSourceCell.swift in Sources */,

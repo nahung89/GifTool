@@ -150,6 +150,7 @@ class GenerateViewController: UIViewController {
         
         videoMerge = VideoMerge(videoUrl: cacheVideoUrl,
                                 source: videoComment,
+                                title: videoComment.video.title,
                                 exportUrl: exportUrl,
                                 exportWidth: exportWidth)
         
@@ -188,6 +189,7 @@ class GenerateViewController: UIViewController {
         
         smallVideoMerge = VideoMerge(videoUrl: cacheVideoUrl,
                                      source: videoComment,
+                                     title: "",
                                      exportUrl: smallExportUrl,
                                      exportWidth: smallExportWidth)
         
@@ -316,8 +318,10 @@ private extension GenerateViewController {
         
         videoArea.removeAllSubview()
         
+        let titleHeight = TitleView.calculateSize(text: videoComment.video.title, videoWidth: videoArea.frame.width).height
+        
         // Update video area
-        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
+        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width + titleHeight
         view.layoutIfNeeded()
         playerView.frame = videoArea.bounds
         videoArea.addSubview(playerView)
@@ -326,28 +330,28 @@ private extension GenerateViewController {
         playerView.setURL(exportUrl, showMark: false)
     }
     
-    func playDownloadVideo(_ downloadUrl: URL) {
-        guard let videoComment = videoComment else { return }
-        
-        // Update video area
-        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
-        videoArea.layoutIfNeeded()
-        playerView.frame = videoArea.bounds
-        videoArea.addSubview(playerView)
-        
-        playerDisposeBag = DisposeBag()
-        playerView.progress.asDriver().drive(onNext: { [unowned self] (progress) in
-            if let time = progress {
-                guard let comment = self.dequeueComment(time) else { return }
-                self.show(comment: comment)
-            } else {
-                self.commentsQueue = videoComment.comments
-                self.videoArea.removeAllSubview()
-            }
-        }).disposed(by: playerDisposeBag)
-        
-        playerView.setURL(downloadUrl, showMark: true)
-    }
+//    func playDownloadVideo(_ downloadUrl: URL) {
+//        guard let videoComment = videoComment else { return }
+//
+//        // Update video area
+//        videoHeightConstraint.constant = videoArea.frame.width * videoComment.video.size.height / videoComment.video.size.width
+//        videoArea.layoutIfNeeded()
+//        playerView.frame = videoArea.bounds
+//        videoArea.addSubview(playerView)
+//        
+//        playerDisposeBag = DisposeBag()
+//        playerView.progress.asDriver().drive(onNext: { [unowned self] (progress) in
+//            if let time = progress {
+//                guard let comment = self.dequeueComment(time) else { return }
+//                self.show(comment: comment)
+//            } else {
+//                self.commentsQueue = videoComment.comments
+//                self.videoArea.removeAllSubview()
+//            }
+//        }).disposed(by: playerDisposeBag)
+//
+//        playerView.setURL(downloadUrl, showMark: true)
+//    }
 
     func dequeueComment(_ time: TimeInterval) -> Comment? {
         for (idx, comment) in commentsQueue.enumerated() {
@@ -436,7 +440,7 @@ extension GenerateViewController {
         let uploadUrl = "https://api4.vibbidi.com/v5.0/admin/sgifs"
         // let uploadUrl = "http://v4-api.vibbidi.com:8018/v5.0/admin/sgifs"
         uploadRequest?.cancel()
-        
+
         Alamofire.upload(
             multipartFormData: { multipartFormData in
                 multipartFormData.append(exportUrl, withName: "file")
@@ -453,7 +457,7 @@ extension GenerateViewController {
                         self?.exportLabel.text = "Uploading video: \(progress.fractionCompleted)..."
                         self?.progressView.progress = Float(progress.fractionCompleted)
                     })
-                    
+
                     upload.responseJSON { [weak self] response in
                         self?.exportLabel.text = response.description
                         AppDelegate.shared().finishComplileVideo.onNext(videoId)
