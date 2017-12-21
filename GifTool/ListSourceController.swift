@@ -26,6 +26,8 @@ class ListSourceController: UIViewController {
     private var filterVideos: [Video] = []
     static private(set) var emojis: [Emoji] = []
     
+    private var allowToCompile: Bool = false
+    
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -83,6 +85,14 @@ class ListSourceController: UIViewController {
             let video = sender as? Video
             else { return }
         controller.set(video: video)
+    }
+    
+    override func performSegue(withIdentifier identifier: String, sender: Any?) {
+        if allowToCompile {
+            super.performSegue(withIdentifier: identifier, sender: sender)
+        } else {
+            displayError("Emojis are downloading. Pls wait.")
+        }
     }
 }
 
@@ -174,6 +184,8 @@ extension ListSourceController {
         
         progressView.progress = 0
         
+        self.allowToCompile = false
+        
         let imageFetcher = ImagePrefetcher(urls: urls, options: [.downloadPriority(1.0)], progressBlock: { (skipped, failed, completed) in
             DispatchQueue.main.async {
                 self.progressView.progress = Float(skipped.count + completed.count) / Float(urls.count)
@@ -183,6 +195,11 @@ extension ListSourceController {
             DispatchQueue.main.async {
                 self.progressView.progress = Float(skipped.count + completed.count) / Float(urls.count)
                 self.emojiStatusLabel.text = "Emoji downloaded. \(skipped.count + completed.count)/\(urls.count). Failed: \(failed.count)"
+                if !failed.isEmpty {
+                    self.displayError("\(failed.count) emojis can't download. Try again.")
+                } else {
+                    self.allowToCompile = true
+                }
             }
         }
             
