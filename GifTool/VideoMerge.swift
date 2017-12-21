@@ -25,9 +25,12 @@ class VideoMerge {
     
     private(set) var state: State = .none
     
-    private var videoUrl: URL
-    private var source: VideoComment
+    private let videoUrl: URL
+    private let source: VideoComment
+    private let title: String
+    
     private let kExportWidth: CGFloat // round width to multiply of 16
+    private let kTopAreaHeight: CGFloat
     private var overlayViews: [UIView] = []
     
     private var exportUrl: URL
@@ -37,18 +40,19 @@ class VideoMerge {
     private var completionBlock: VideoExportCompletionBlock?
     
     private let kDisplayWidth: CGFloat = UIScreen.main.bounds.width
-    // private let kExportWidth: CGFloat = 600
     private let kNumberOfLines: CGFloat = 5
     
     var exportSize: CGSize? {
         return exportSession?.videoComposition?.renderSize
     }
     
-    init(videoUrl: URL, source: VideoComment, exportUrl: URL, exportWidth: CGFloat) {
+    init(videoUrl: URL, source: VideoComment, title: String, exportUrl: URL, exportWidth: CGFloat) {
         self.videoUrl = videoUrl
         self.source = source
         self.exportUrl = exportUrl
         self.kExportWidth = exportWidth
+        self.title = title
+        self.kTopAreaHeight = TitleView.calculateSize(text: title, videoWidth: exportWidth).height
     }
     
     deinit {
@@ -181,7 +185,7 @@ private extension VideoMerge {
         let naturalSize = videoCompositionTrack.naturalSize
         let scale: CGFloat = kExportWidth / naturalSize.width
         let exportSize = CGSize(width: ceil(naturalSize.width * scale / 16) * 16,
-                                height:ceil(naturalSize.height * scale / 16) * 16 + 100)
+                                height:ceil(naturalSize.height * scale / 16) * 16 + kTopAreaHeight)
         
         log.info("export-size: \(exportSize)")
         
@@ -274,7 +278,7 @@ private extension VideoMerge {
         let scale = max(exportSize.width / naturalSize.width, exportSize.height / naturalSize.height)
         
         let transform = videoCompositionTrack.preferredTransform.scaledBy(x: exportSize.width / naturalSize.width,
-                                                                          y: (exportSize.height + 100) / naturalSize.height)
+                                                                          y: (exportSize.height + kTopAreaHeight) / naturalSize.height)
         
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoCompositionTrack)
         instruction.setTransform(transform, at: kCMTimeZero)
@@ -284,11 +288,7 @@ private extension VideoMerge {
     
     private func addEffect(to outputComposition: AVMutableVideoComposition) {
         var exportFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
-        var videoFrame = CGRect(x: 0, y: 0, width: exportFrame.width, height: exportFrame.height - 100)
-
-        
-//        var videoFrame = CGRect(origin: CGPoint.zero, size: outputComposition.renderSize)
-//        var exportFrame = CGRect(x: 0, y: 0, width: videoFrame.width, height: videoFrame.height + 100)
+        var videoFrame = CGRect(x: 0, y: 0, width: exportFrame.width, height: exportFrame.height - kTopAreaHeight)
         
         log.info("export-frame: \(exportFrame)")
         log.info("video-frame: \(videoFrame)")
@@ -340,13 +340,18 @@ private extension VideoMerge {
         let parentLayer = CALayer()
         parentLayer.frame = exportFrame
         
+        let titleView = TitleView(text: title, videoSize: videoFrame.size)
+        titleView.frame.origin = CGPoint(x: 0, y: exportFrame.height - titleView.frame.height)
+        parentLayer.addSublayer(titleView.layer)
+        overlayViews.append(titleView) // *Very importance: Must store instance, otherwise it can't render
+        
         let videoLayer = CALayer()
         videoLayer.frame = videoFrame
         
         parentLayer.addSublayer(videoLayer)
         parentLayer.addSublayer(overlayLayer)
         
-        parentLayer.backgroundColor = UIColor.red.cgColor
+//        parentLayer.backgroundColor = UIColor.red.cgColor
 //        videoLayer.backgroundColor = UIColor.blue.withAlphaComponent(0.5).cgColor
 //        overlayLayer.backgroundColor = UIColor.green.withAlphaComponent(0.5).cgColor
         

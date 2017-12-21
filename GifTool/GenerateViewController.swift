@@ -150,6 +150,9 @@ class GenerateViewController: UIViewController {
         
         videoMerge = VideoMerge(videoUrl: cacheVideoUrl,
                                 source: videoComment,
+                                // title: "",
+                                // title: "The Struggles Of A Lactose Intolerant Cheese Lover",
+                                title: "Hard Liquor And I Don’t Mix",
                                 exportUrl: exportUrl,
                                 exportWidth: exportWidth)
         
@@ -189,6 +192,7 @@ class GenerateViewController: UIViewController {
         
         smallVideoMerge = VideoMerge(videoUrl: cacheVideoUrl,
                                      source: videoComment,
+                                     title: "The Struggles Of A Lactose Intolerant Cheese Lover",
                                      exportUrl: smallExportUrl,
                                      exportWidth: smallExportWidth)
         
@@ -253,9 +257,9 @@ extension GenerateViewController {
             let videoPath = videoComment?.video.videoPath,
             let videoUrl = URL(string: videoPath),
             let exportUrl = createExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
-            FileManager.default.fileExists(atPath: exportUrl.path),
-            FileManager.default.fileExists(atPath: smallExportUrl.path)
+            //let smallExportUrl = createSmallExportDirectory()?.appendingPathComponent(videoUrl.lastPathComponent),
+            FileManager.default.fileExists(atPath: exportUrl.path)
+            // FileManager.default.fileExists(atPath: smallExportUrl.path)
             else {
                 DispatchQueue.main.async { [weak self] in
                     self?.saveButton.setTitle("Can't save..", for: .normal)
@@ -265,7 +269,7 @@ extension GenerateViewController {
         
         PHPhotoLibrary.shared().performChanges({
             _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: exportUrl)
-            _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
+            // _ = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: smallExportUrl)
         }, completionHandler: { (success, error) in
             DispatchQueue.main.async { [weak self] in
                 self?.saveButton.setTitle("Saved!", for: .normal)
