@@ -6,6 +6,7 @@ custom_categories:
   - ControlTarget
   - DelegateProxy
   - DelegateProxyType
+  - KeyPathBinder
   - NSLayoutConstraint+Rx
   - Observable+Bind
   - RxCocoaObjCRuntimeError+Extensions
@@ -46,12 +47,14 @@ custom_categories:
   - ObservableConvertibleType+Driver
 - name: RxCocoa/Traits/SharedSequence
   children:
+  - ObservableConvertibleType+SharedSequence
   - SchedulerType+SharedSequence
   - SharedSequence+Operators+arity
   - SharedSequence+Operators
   - SharedSequence
 - name: RxCocoa/Traits/Signal
   children:
+  - ControlEvent+Signal
   - ObservableConvertibleType+Signal
   - PublishRelay+Signal
   - Signal+Subscription
@@ -107,6 +110,7 @@ custom_categories:
   - RxTableViewDataSourceType
 - name: RxCocoa/iOS/Proxies
   children:
+  - RxCollectionViewDataSourcePrefetchingProxy
   - RxCollectionViewDataSourceProxy
   - RxCollectionViewDelegateProxy
   - RxNavigationControllerDelegateProxy
@@ -117,6 +121,7 @@ custom_categories:
   - RxSearchControllerDelegateProxy
   - RxTabBarControllerDelegateProxy
   - RxTabBarDelegateProxy
+  - RxTableViewDataSourcePrefetchingProxy
   - RxTableViewDataSourceProxy
   - RxTableViewDelegateProxy
   - RxTextStorageDelegateProxy
@@ -129,6 +134,7 @@ custom_categories:
   - NSImageView+Rx
   - NSSlider+Rx
   - NSTextField+Rx
+  - NSTextView+Rx
   - NSView+Rx
 - name: RxSwift
   children:
@@ -252,18 +258,20 @@ custom_categories:
   - AnonymousObserver
   - ObserverBase
   - TailRecursiveSink
+- name: RxSwift/Platform
+  children:
+  - AtomicInt
+  - DeprecationWarner
+  - DispatchQueue+Extensions
+  - Platform.Darwin
+  - Platform.Linux
+  - RecursiveLock
 - name: RxSwift/Platform/DataStructures
   children:
   - Bag
   - InfiniteSequence
   - PriorityQueue
   - Queue
-- name: RxSwift/Platform
-  children:
-  - DispatchQueue+Extensions
-  - Platform.Darwin
-  - Platform.Linux
-  - RecursiveLock
 - name: RxSwift/Schedulers
   children:
   - ConcurrentDispatchQueueScheduler

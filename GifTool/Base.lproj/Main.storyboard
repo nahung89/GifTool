@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jXD-6i-BFt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jXD-6i-BFt">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -204,7 +203,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q0j-xa-qfc">
-                                <rect key="frame" x="87" y="571" width="200" height="30"/>
+                                <rect key="frame" x="87.5" y="571" width="200" height="30"/>
                                 <color key="backgroundColor" red="1" green="0.95730383417970022" blue="0.11493582823331716" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="W9Z-jQ-IgK"/>
@@ -216,7 +215,7 @@
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nha-sV-vdt">
-                                <rect key="frame" x="87" y="571" width="200" height="30"/>
+                                <rect key="frame" x="87.5" y="571" width="200" height="30"/>
                                 <color key="backgroundColor" red="0.34226566108534251" green="1" blue="0.55959709360646626" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="9t1-OZ-bDh"/>
@@ -228,7 +227,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="StR-EU-ZiR">
-                                <rect key="frame" x="87" y="511" width="200" height="30"/>
+                                <rect key="frame" x="87.5" y="511" width="200" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="4zB-6H-95N"/>
                                     <constraint firstAttribute="height" constant="30" id="TLe-GA-0jl"/>
@@ -279,6 +278,64 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mML-rX-jBj" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1477.5999999999999" y="374.66266866566718"/>
+        </scene>
+        <!--Check Result View Controller-->
+        <scene sceneID="Cr5-oG-1c5">
+            <objects>
+                <viewController id="0OP-m3-eVw" customClass="CheckResultViewController" customModule="GifTool" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="arA-w5-ajK">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" placeholderIntrinsicWidth="375" placeholderIntrinsicHeight="50" translatesAutoresizingMaskIntoConstraints="NO" id="mhE-8R-5kE">
+                                <rect key="frame" x="0.0" y="617" width="375" height="50"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mWd-Qw-6Oh">
+                                        <rect key="frame" x="15" y="14" width="345" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zhc-3q-p5j">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="2"/>
+                                    </progressView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="mWd-Qw-6Oh" secondAttribute="trailing" constant="15" id="GkL-LB-m6w"/>
+                                    <constraint firstItem="zhc-3q-p5j" firstAttribute="leading" secondItem="mhE-8R-5kE" secondAttribute="leading" id="Kwl-KZ-Ky3"/>
+                                    <constraint firstItem="mWd-Qw-6Oh" firstAttribute="leading" secondItem="mhE-8R-5kE" secondAttribute="leading" constant="15" id="O9C-k4-vIQ"/>
+                                    <constraint firstAttribute="bottom" secondItem="mWd-Qw-6Oh" secondAttribute="bottom" constant="15" id="Zk3-AG-Slr"/>
+                                    <constraint firstAttribute="top" secondItem="zhc-3q-p5j" secondAttribute="top" id="bMe-c8-AyV"/>
+                                    <constraint firstAttribute="trailing" secondItem="zhc-3q-p5j" secondAttribute="trailing" id="gqn-Mg-1dr"/>
+                                    <constraint firstItem="mWd-Qw-6Oh" firstAttribute="top" secondItem="mhE-8R-5kE" secondAttribute="top" constant="14" id="k5l-Xp-FbB"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pq5-vp-wlh">
+                                <rect key="frame" x="80" y="318" width="216" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Run"/>
+                                <connections>
+                                    <action selector="run" destination="0OP-m3-eVw" eventType="touchUpInside" id="Sa4-21-fve"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="0.83036307575365709" blue="0.55239845056775949" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="mhE-8R-5kE" firstAttribute="trailing" secondItem="Ef1-SO-pxY" secondAttribute="trailing" id="MFJ-DN-RyQ"/>
+                            <constraint firstItem="mhE-8R-5kE" firstAttribute="bottom" secondItem="Ef1-SO-pxY" secondAttribute="bottom" id="MjM-oU-9yU"/>
+                            <constraint firstItem="mhE-8R-5kE" firstAttribute="leading" secondItem="Ef1-SO-pxY" secondAttribute="leading" id="ive-3F-Ev3"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Ef1-SO-pxY"/>
+                    </view>
+                    <connections>
+                        <outlet property="exportLabel" destination="mWd-Qw-6Oh" id="8cC-sl-Ldn"/>
+                        <outlet property="progressView" destination="zhc-3q-p5j" id="n7m-vG-8UY"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QmN-kI-AU5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2300" y="374.66266866566718"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="GPJ-wc-Ceg">

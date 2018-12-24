@@ -1,7 +1,7 @@
 //
 //  AFDateHelper.swift
 //  https://github.com/melvitax/DateHelper
-//  Version 4.2.6
+//  Version 4.2.8
 //
 //  Created by Melvin Rivera on 7/15/14.
 //  Copyright (c) 2014. All rights reserved.
@@ -31,7 +31,11 @@ public extension Date {
                 guard let match = regex.firstMatch(in: string, range: NSRange(location: 0, length: string.utf16.count)) else {
                     return nil
                 }
+                 #if swift(>=4.0)
                 let dateString = (string as NSString).substring(with: match.range(at: 1))
+                #else
+                let dateString = (string as NSString).substring(with: match.rangeAt(1))
+                #endif
                 let interval = Double(dateString)! / 1000.0
                 self.init(timeIntervalSince1970: interval)
                 return
@@ -91,8 +95,6 @@ public extension Date {
         }
     }
     
-    
-    
     /// Converts the date to string based on a date format, optional timezone and optional locale.
     func toString(format: DateFormatType, timeZone: TimeZoneType = .local, locale: Locale = Locale.current) -> String {
         switch format {
@@ -113,7 +115,6 @@ public extension Date {
         return formatter.string(from: self)
     }
     
-    
     /// Converts the date to string based on a relative time language. i.e. just now, 1 minute ago etc...
     func toStringWithRelativeTime(strings:[RelativeTimeStringType:String]? = nil) -> String {
         
@@ -125,7 +126,6 @@ public extension Date {
         let min:Double = round(sec/60)
         let hr:Double = round(min/60)
         let d:Double = round(hr/24)
-        
         
         if sec < 60 {
             if sec < 10 {
@@ -358,15 +358,14 @@ public extension Date {
     
     // MARK: Date for...
     
-    func dateFor(_ type:DateForType) -> Date {
+    func dateFor(_ type:DateForType, calendar:Calendar = Calendar.current) -> Date {
         switch type {
         case .startOfDay:
             return adjust(hour: 0, minute: 0, second: 0)
         case .endOfDay:
             return adjust(hour: 23, minute: 59, second: 59)
         case .startOfWeek:
-            let offset = component(.weekday)!-1
-            return adjust(.day, offset: -(offset))
+            return calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
         case .endOfWeek:
             let offset = 7 - component(.weekday)!
             return adjust(.day, offset: offset)
@@ -611,13 +610,26 @@ public enum DateFormatType {
     }
 }
 
+extension DateFormatType: Equatable {
+    public static func ==(lhs: DateFormatType, rhs: DateFormatType) -> Bool {
+        switch (lhs, rhs) {
+        case (.custom(let lhsString), .custom(let rhsString)):
+            return lhsString == rhsString
+        default:
+            return lhs == rhs
+        }
+    }
+}
+
 /// The time zone to be used for date conversion
 public enum TimeZoneType {
-    case local, utc
+    case local, `default`, utc, custom(Int)
     var timeZone:TimeZone {
         switch self {
         case .local: return NSTimeZone.local
+        case .default: return NSTimeZone.default
         case .utc: return TimeZone(secondsFromGMT: 0)!
+        case let .custom(gmt): return TimeZone(secondsFromGMT: gmt)!
         }
     }
 }

@@ -27,11 +27,11 @@ extension DriverTest {
         var disposable3: Disposable!
 
         let coldObservable = scheduler.createColdObservable([
-            next(10, 0),
-            next(20, 1),
-            next(30, 2),
-            next(40, 3),
-            error(50, testError)
+            .next(10, 0),
+            .next(20, 1),
+            .next(30, 2),
+            .next(40, 3),
+            .error(50, testError)
             ])
         let driver = coldObservable.asDriver(onErrorJustReturn: -1)
 
@@ -64,22 +64,22 @@ extension DriverTest {
         scheduler.start()
 
         XCTAssertEqual(observer1.events, [
-            next(210, 0),
-            next(220, 1),
-            next(230, 2)
+            .next(210, 0),
+            .next(220, 1),
+            .next(230, 2)
         ])
 
         XCTAssertEqual(observer2.events, [
-            next(225, 1),
-            next(230, 2),
-            next(240, 3),
-            next(250, -1),
-            completed(250)
+            .next(225, 1),
+            .next(230, 2),
+            .next(240, 3),
+            .next(250, -1),
+            .completed(250)
         ])
 
         XCTAssertEqual(observer3.events, [
-            next(270, 0),
-            next(280, 1),
+            .next(270, 0),
+            .next(280, 1),
         ])
 
         XCTAssertEqual(coldObservable.subscriptions, [
@@ -99,11 +99,11 @@ extension DriverTest {
         var disposable3: Disposable!
 
         let coldObservable = scheduler.createColdObservable([
-            next(10, 0),
-            next(20, 1),
-            next(30, 2),
-            next(40, 3),
-            completed(50)
+            .next(10, 0),
+            .next(20, 1),
+            .next(30, 2),
+            .next(40, 3),
+            .completed(50)
             ])
         let driver = coldObservable.asDriver(onErrorJustReturn: -1)
 
@@ -137,21 +137,21 @@ extension DriverTest {
         scheduler.start()
 
         XCTAssertEqual(observer1.events, [
-            next(210, 0),
-            next(220, 1),
-            next(230, 2)
+            .next(210, 0),
+            .next(220, 1),
+            .next(230, 2)
         ])
 
         XCTAssertEqual(observer2.events, [
-            next(225, 1),
-            next(230, 2),
-            next(240, 3),
-            completed(250)
+            .next(225, 1),
+            .next(230, 2),
+            .next(240, 3),
+            .completed(250)
         ])
 
         XCTAssertEqual(observer3.events, [
-            next(270, 0),
-            next(280, 1),
+            .next(270, 0),
+            .next(280, 1),
         ])
 
         XCTAssertEqual(coldObservable.subscriptions, [
@@ -262,39 +262,39 @@ extension DriverTest {
         var disposeBag = DisposeBag()
         let scheduler = TestScheduler(initialClock: 0)
         let observer = scheduler.createObserver(String.self)
-        let variable = Variable("initial")
+        let relay = BehaviorRelay(value: "initial")
 
-        variable.asDriver()
+        relay.asDriver()
             .drive(observer)
             .disposed(by: disposeBag)
 
         prepareSampleDriver(with: "first")
-            .drive(variable)
+            .drive(relay)
             .disposed(by: disposeBag)
 
         prepareSampleDriver(with: "second")
-            .drive(variable)
+            .drive(relay)
             .disposed(by: disposeBag)
 
         Observable.just("third")
-            .bind(to: variable)
+            .bind(to: relay)
             .disposed(by: disposeBag)
 
         disposeBag = DisposeBag()
 
         XCTAssertEqual(observer.events, [
-            next(0, "initial"),
-            next(0, "first"),
-            next(0, "second"),
-            next(0, "third")
+            .next(0, "initial"),
+            .next(0, "first"),
+            .next(0, "second"),
+            .next(0, "third")
             ])
 
     }
 
     func testDrivingOrderOfSynchronousSubscriptions2() {
         var latestValue: Int?
-        let state = Variable(1)
-        _ = state.asDriver()
+        let state = BehaviorSubject(value: 1)
+        let subscription = state.asDriver(onErrorJustReturn: 0)
             .flatMapLatest { x in
                 return Driver.just(x * 2)
             }
@@ -310,6 +310,8 @@ extension DriverTest {
             .drive(onNext: { element in
                 latestValue = element
             })
+
+        subscription.dispose()
 
         XCTAssertEqual(latestValue, 2)
     }
@@ -356,40 +358,40 @@ extension DriverTest {
     }
 }
 
-// MARK: drive variable
+// MARK: drive relay
 
 extension DriverTest {
-    func testDriveVariable() {
-        let variable = Variable<Int>(0)
+    func testDriveRelay() {
+        let relay = BehaviorRelay<Int>(value: 0)
 
-        _ = (Driver.just(1) as Driver<Int>).drive(variable)
+        _ = (Driver.just(1) as Driver<Int>).drive(relay)
 
-        XCTAssertEqual(variable.value, 1)
+        XCTAssertEqual(relay.value, 1)
     }
 
-    func testDriveOptionalVariable1() {
-        let variable = Variable<Int?>(0)
+    func testDriveOptionalRelay1() {
+        let relay = BehaviorRelay<Int?>(value: 0)
 
-        _ = (Driver.just(1) as Driver<Int>).drive(variable)
+        _ = (Driver.just(1) as Driver<Int>).drive(relay)
 
-        XCTAssertEqual(variable.value, 1)
+        XCTAssertEqual(relay.value, 1)
     }
 
-    func testDriveOptionalVariable2() {
-        let variable = Variable<Int?>(0)
+    func testDriveOptionalRelay2() {
+        let relay = BehaviorRelay<Int?>(value: 0)
 
-        _ = (Driver.just(1) as Driver<Int?>).drive(variable)
+        _ = (Driver.just(1) as Driver<Int?>).drive(relay)
 
-        XCTAssertEqual(variable.value, 1)
+        XCTAssertEqual(relay.value, 1)
     }
 
-    func testDriveVariableNoAmbiguity() {
-        let variable = Variable<Int?>(0)
+    func testDriveRelayNoAmbiguity() {
+        let relay = BehaviorRelay<Int?>(value: 0)
 
         // shouldn't cause compile time error
-        _ = Driver.just(1).drive(variable)
+        _ = Driver.just(1).drive(relay)
 
-        XCTAssertEqual(variable.value, 1)
+        XCTAssertEqual(relay.value, 1)
     }
 }
 

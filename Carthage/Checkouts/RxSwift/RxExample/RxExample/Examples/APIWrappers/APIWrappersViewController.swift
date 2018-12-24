@@ -8,10 +8,8 @@
 
 import UIKit
 import CoreLocation
-#if !RX_NO_MODULE
 import RxSwift
 import RxCocoa
-#endif
 
 extension UILabel {
     open override var accessibilityValue: String! {
@@ -73,7 +71,7 @@ class APIWrappersViewController: ViewController {
         // MARK: UISegmentedControl
 
         // also test two way binding
-        let segmentedValue = Variable(0)
+        let segmentedValue = BehaviorRelay(value: 0)
         _ = segmentedControl.rx.value <-> segmentedValue
 
         segmentedValue.asObservable()
@@ -86,7 +84,7 @@ class APIWrappersViewController: ViewController {
         // MARK: UISwitch
 
         // also test two way binding
-        let switchValue = Variable(true)
+        let switchValue = BehaviorRelay(value: true)
         _ = switcher.rx.value <-> switchValue
 
         switchValue.asObservable()
@@ -113,7 +111,7 @@ class APIWrappersViewController: ViewController {
         // MARK: UISlider
 
         // also test two way binding
-        let sliderValue = Variable<Float>(1.0)
+        let sliderValue = BehaviorRelay<Float>(value: 1.0)
         _ = slider.rx.value <-> sliderValue
 
         sliderValue.asObservable()
@@ -126,7 +124,7 @@ class APIWrappersViewController: ViewController {
         // MARK: UIDatePicker
 
         // also test two way binding
-        let dateValue = Variable(Date(timeIntervalSince1970: 0))
+        let dateValue = BehaviorRelay(value: Date(timeIntervalSince1970: 0))
         _ = datePicker.rx.date <-> dateValue
 
 
@@ -139,30 +137,36 @@ class APIWrappersViewController: ViewController {
 
         // MARK: UITextField
 
-        // also test two way binding
-        let textValue = Variable("")
-        _ = textField.rx.textInput <-> textValue
+        // because of leak in ios 11.2
+        //
+        // final class UITextFieldSubclass: UITextField { deinit { print("never called")  } }
+        // let textField = UITextFieldSubclass(frame: .zero)
+        if #available(iOS 11.2, *) {
+            // also test two way binding
+            let textValue = BehaviorRelay(value: "")
+            _ = textField.rx.textInput <-> textValue
 
-        textValue.asObservable()
-            .subscribe(onNext: { [weak self] x in
-                self?.debug("UITextField text \(x)")
-            })
-            .disposed(by: disposeBag)
+            textValue.asObservable()
+                .subscribe(onNext: { [weak self] x in
+                    self?.debug("UITextField text \(x)")
+                })
+                .disposed(by: disposeBag)
 
-        textValue.asObservable()
-            .subscribe(onNext: { [weak self] x in
-                self?.debug("UITextField text \(x)")
-            })
-            .disposed(by: disposeBag)
+            textValue.asObservable()
+                .subscribe(onNext: { [weak self] x in
+                    self?.debug("UITextField text \(x)")
+                })
+                .disposed(by: disposeBag)
 
-        let attributedTextValue = Variable<NSAttributedString?>(NSAttributedString(string: ""))
-        _ = textField2.rx.attributedText <-> attributedTextValue
+            let attributedTextValue = BehaviorRelay<NSAttributedString?>(value: NSAttributedString(string: ""))
+            _ = textField2.rx.attributedText <-> attributedTextValue
 
-        attributedTextValue.asObservable()
-            .subscribe(onNext: { [weak self] x in
-                self?.debug("UITextField attributedText \(x?.description ?? "")")
-            })
-            .disposed(by: disposeBag)
+            attributedTextValue.asObservable()
+                .subscribe(onNext: { [weak self] x in
+                    self?.debug("UITextField attributedText \(x?.description ?? "")")
+                })
+                .disposed(by: disposeBag)
+        }
 
         // MARK: UIGestureRecognizer
 
@@ -176,7 +180,7 @@ class APIWrappersViewController: ViewController {
         // MARK: UITextView
 
         // also test two way binding
-        let textViewValue = Variable("")
+        let textViewValue = BehaviorRelay(value: "")
         _ = textView.rx.textInput <-> textViewValue
 
         textViewValue.asObservable()
@@ -185,7 +189,7 @@ class APIWrappersViewController: ViewController {
             })
             .disposed(by: disposeBag)
 
-        let attributedTextViewValue = Variable<NSAttributedString?>(NSAttributedString(string: ""))
+        let attributedTextViewValue = BehaviorRelay<NSAttributedString?>(value: NSAttributedString(string: ""))
         _ = textView2.rx.attributedText <-> attributedTextViewValue
 
         attributedTextViewValue.asObservable()
@@ -195,10 +199,7 @@ class APIWrappersViewController: ViewController {
             .disposed(by: disposeBag)
 
         // MARK: CLLocationManager
-
-        #if !RX_NO_MODULE
         manager.requestWhenInUseAuthorization()
-        #endif
 
         manager.rx.didUpdateLocations
             .subscribe(onNext: { x in

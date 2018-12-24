@@ -1,9 +1,9 @@
 {
-  "commitish" : "2.5.0",
+  "commitish" : "3.0.0",
   "iOS" : [
     {
       "name" : "Unbox",
-      "hash" : "f4179e35b16a2cbe985326f40016d8e091c3f6757af55c342ffee0bc9aee26d2"
+      "hash" : "785c23058e66a2a96ef837b268701ca3973b0d2755e6aa72f54580d3b1fb3073"
     }
   ]
 }

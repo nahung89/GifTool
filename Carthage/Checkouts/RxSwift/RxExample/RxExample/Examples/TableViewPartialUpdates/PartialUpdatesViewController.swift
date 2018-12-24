@@ -7,10 +7,8 @@
 //
 
 import UIKit
-#if !RX_NO_MODULE
 import RxSwift
 import RxCocoa
-#endif
 
 let generateCustomSize = true
 let runAutomatically = false
@@ -45,7 +43,7 @@ class PartialUpdatesViewController : ViewController {
 
     var generator = Randomizer(rng: PseudoRandomGenerator(4, 3), sections: initialValue)
 
-    var sections = Variable([NumberSection]())
+    var sections = BehaviorRelay(value: [NumberSection]())
 
     /**
      Code for reactive data sources is packed in [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources) project.
@@ -77,7 +75,7 @@ class PartialUpdatesViewController : ViewController {
             timer = NSTimer.scheduledTimerWithTimeInterval(0.6, target: self, selector: "randomize", userInfo: nil, repeats: true)
         #endif
 
-        self.sections.value = generator.sections
+        self.sections.accept(generator.sections)
 
         let (configureCell, titleForSection) = PartialUpdatesViewController.tableViewDataSourceUI()
         let tvAnimatedDataSource = RxTableViewSectionedAnimatedDataSource<NumberSection>(
@@ -159,7 +157,7 @@ class PartialUpdatesViewController : ViewController {
 
         //print(values)
 
-        sections.value = values
+        sections.accept(values)
     }
 }
 

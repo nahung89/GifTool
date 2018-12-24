@@ -2,16 +2,107 @@
 All notable changes to this project will be documented in this file.
 
 ---
-
 ## Master
 
-* Adds `materialize()` operator for RxBlocking's `BlockingObservable`. #1383
-* Adds `first` operator to `ObservableType`.
+## [4.4.0](https://github.com/ReactiveX/RxSwift/releases/tag/4.4.0)
+
+**This relase introduces new framework `RxAtomic` that enables using C11 atomic primities in RxSwift as a replacement for deprecated `OSAtomic*` functions.**
+**Carthage users will probably need to include this framework manually.**
+
+* Updates deprecated `OSAtomic*` primitives to use C11 atomic primitives.
+* Adds `Event`, `SingleEvent`, `MaybeEvent` and `Recorded` conditional conformance to `Equatable` where their `Element` is equatable on `RXTest` for clients that are using Swift >= 4.1. 
+* Adds `string` to `NSTextView`.
+* Consolidates per platform frameworks to multi-platform frameworks.
+* Xcode 10.1 compatible.
 
 #### Anomalies
 
-* Call `controlTextDidChange(…)` as an optional method. #1406
-* Fixed issue with `NSControl.rx.value` regarding multiple observers. #1399
+* Fixes problem with canceling events scheduled on serial scheduler through `observeOn` operator.  #1778
+* Fixes problem with `UISearchBar.text` property not triggering update when cancel button is tapped. #1714 
+* Updates watchos minimum target to 3.0. #1752
+
+## [4.3.1](https://github.com/ReactiveX/RxSwift/releases/tag/4.3.1)
+
+#### Anomalies
+
+* Fixes issues with CocoaPods and Swift 4.2 version.
+
+## [4.3.0](https://github.com/ReactiveX/RxSwift/releases/tag/4.3.0)
+
+* Compatibility with Xcode 10.0
+* Adds new `insert` extension to collect and add multiple disposables to `DisposeBag`.
+* Removes string interpolation warning
+* Adds `scan(into:accumulator:)`.
+* Adds `queuePriority` parameter (defaults to `.normal`) to `OperationQueueScheduler`.
+* Performance enhancement reduces Bag dispatch inline code size by 12%.
+* Adds `customCaptureSubscriptionCallstack` hook to allow custom subscription callstacks to be generated.
+* Remove usage of `Variable` from Playground, Example projects and Tests.
+* Add `XCTAssertRecordedElements` to `XCTest+Rx`.
+
+#### Anomalies
+
+* Fix build issues on new arm64_32 architecture (watchOS 5).
+
+## [4.2.0](https://github.com/ReactiveX/RxSwift/releases/tag/4.2.0)
+
+* Adds Smart Key Path subscripting to create a binder for property of object.
+* Adds `UICollectionView` extensions:
+    * `prefetchItems`
+    * cancelPrefetchingForItems
+* Adds `UITableView` extensions:
+    * `prefetchRows`
+    * `cancelPrefetchingForRows`
+* Fixes various spelling mistakes and missing parameters.
+* Adds `UISegmentedControlExtensions`:
+    * `titleForSegment(at:)`
+    * `imageForSegment(at:)`
+* Adds `Maybe.ifEmpty(default:)` operator.
+* Adds `Maybe.ifEmpty(switchTo:)` operator.
+* Adds `Maybe.catchErrorJustReturn(_:)` operator.
+* Add  `Single.flatMapMaybe(_:)` operator.
+* Add  `Single.flatMapCompletable(_:)` operator.
+* Add  `Single.zip(_:)` operator.
+* Add  `Single.catchErrorJustReturn(_:)` operator.
+* Add  `Single.asMaybe(_:)` operator.
+* Add  `Single.asCompletable(_:)` operator.
+* Use `editingEvents` argument in `controlPropertyWithDefaultEvents`.
+
+#### Anomalies
+
+* Lower macOS Deployment Target to 10.9
+* Deprecates `UISegmentedControl.enabled(forSegmentAt:)` in favor of `UISegmentedControl.enabledForSegment(at:)`.
+
+## [4.1.2](https://github.com/ReactiveX/RxSwift/releases/tag/4.1.2)
+
+* Adds deprecation warner.
+
+#### Anomalies
+
+* Fixes ambiguity issue with  `Single.do(onNext:onError:onSubscribe:onSubscribed:onDispose:)` and `Single.do(onSuccess:onError:onSubscribe:onSubscribed:onDispose:)`.
+
+## [4.1.1](https://github.com/ReactiveX/RxSwift/releases/tag/4.1.1)
+
+#### Anomalies
+
+* Fixes compilation issue with  Xcode 9.1.
+* Deprecates `Single.do(onNext:onError:onSubscribe:onSubscribed:onDispose:)` in favor of `Single.do(onSuccess:onError:onSubscribe:onSubscribed:onDispose:)`.
+
+## [4.1.0](https://github.com/ReactiveX/RxSwift/releases/tag/4.1.0)
+
+* Adds `Recorded<Event<T>>` array factory method in **RxTest**. #1531
+* Replaces global functions `next`, `error`, `completed` with `Recorded.next`, `Recorded.error`, `Recorded.completed` in **RxTest**. #1510
+* Removes `AnyObject` constraint from `Delegate` parameter on `DelegateProxy`. #1442
+* Adds `ObservableType.bind(to:)` overloads for `PublishRelay` and `BehaviorRelay`.
+* Adds `ControlEvent.asSignal()`.
+* Adds `UISegmentedControl.rx.enabled(forSegmentAt:)` extension.
+* Adds `UIStepper.rx.stepValue` extension.
+* Adds error handling Hook to `Single`, `Maybe` and `Completable`. #1532
+* Adds `recordCallStackOnError` to improve performance of `DEBUG` configuration.
+
+#### Anomalies
+
+* Changes return value of blocking version of `single` operator from `E?` to `E`. #1525
+* Removes deprecation attribute from `asSharedSequence`.
 
 ## [4.0.0](https://github.com/ReactiveX/RxSwift/releases/tag/4.0.0)
 

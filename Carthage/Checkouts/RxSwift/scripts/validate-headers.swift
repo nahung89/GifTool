@@ -45,6 +45,7 @@ let excludedRootPaths = [
 
 let excludePaths = [
     "AllTestz/main.swift",
+    "Platform/AtomicInt.swift",
     "Platform/Platform.Linux.swift",
     "Platform/Platform.Darwin.swift",
     "Platform/RecursiveLock.swift",
@@ -53,6 +54,7 @@ let excludePaths = [
     "Platform/DataStructures/PriorityQueue.swift",
     "Platform/DataStructures/Queue.swift",
     "Platform/DispatchQueue+Extensions.swift",
+    "Platform/DeprecationWarner.swift",
     "RxExample/Services/Reachability.swift",
     "RxDataSources"
 ]
@@ -72,7 +74,7 @@ let createdBy = try NSRegularExpression(pattern: "//  Created by .* on \\d+/\\d+
 let copyrightLine = try NSRegularExpression(pattern: "//  Copyright © (\\d+) Krunoslav Zaher. All rights reserved.", options: [])
 
 func validateRegexMatches(regularExpression: NSRegularExpression, content: String) -> ([String], Bool) {
-    let range = NSRange(location: 0, length: content.characters.count)
+    let range = NSRange(location: 0, length: content.count)
     let matches = regularExpression.matches(in: content, options: [], range: range)
 
     if matches.count == 0 {
@@ -89,12 +91,7 @@ func validateRegexMatches(regularExpression: NSRegularExpression, content: Strin
 
     return (matches[0 ..< matches.count].flatMap { m -> [String] in
         return (1 ..< m.numberOfRanges).map { index in
-
-#if swift(>=4.0)
             let range = m.range(at: index)
-#else
-            let range = m.rangeAt(index)
-#endif
             return (content as NSString).substring(with: range)
         }
     }, true)
